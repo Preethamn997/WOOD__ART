@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; /* Remove margin to avoid extra space */
+      background-color: #f2f2f2;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .top-border {
+      background-color: #42b72a;
+      padding: 10px;
+      text-align: left;
+      color: #fff;
+      font-size: 18px; /* Increase the font size */
+    }
+
+    .register-container {
+      flex-grow: 1; /* Allow the container to grow and take remaining space */
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      text-align: left;
+      margin: 10px 20px; /* Updated margin values */
+      border-top: 5px solid #42b72a;
+      display: flex;
+      flex-direction: column; /* Align form vertically */
+      align-items: flex-start; /* Align form elements to the left */
+    }
+
+    .register-container h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .register-container label {
+      display: inline-block;
+      width: 120px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .register-container input[type="text"],
+    .register-container input[type="password"] {
+      width: 200px;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+
+    .register-container button[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      background-color: #42b72a;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    footer {
+      background-color: #42b72a;
+      padding: 10px;
+      text-align: center;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-border">
+    <h2>Register</h2>
+  </div>
+  <div class="center-text">
+    CanV
+    Furniture
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        {% if category == 'success' %}
+          <div class="flash-message success">{{ message }}</div>
+        {% else %}
+          <div class="flash-message danger">{{ message }}</div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="register-container">
+    <h1>Register</h1>
+    <form action="/register" method="POST">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+      <br>
+      <label for="address">Address:</label>
+      <input type="text" id="address" name="address" required>
+      <br>
+      <label for="contact">Contact:</label>
+      <input type="text" id="contact" name="contact" required>
+      <br>
+      <label for="mail">Email:</label>
+      <input type="text" id="mail" name="mail" required>
+      <br>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      <br>
+      <label for="confirm_password">Confirm Password:</label>
+      <input type="password" id="confirm_password" name="confirm_password" required>
+      <br>
+      <button type="submit">Register</button>
+    </form>
+  </div>
+  <footer>
+    <p>&copy; 2023 CanV Store. All rights reserved.</p>
+  </footer>
+</body>
+</html>
