@@ -5,7 +5,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0; /* Remove margin to avoid extra space */
+      margin: 0;
       background-color: #f2f2f2;
       display: flex;
       flex-direction: column;
@@ -13,33 +13,41 @@
     }
 
     .top-border {
-      background-color: #42b72a;
+      background-color: #FFA500;
       padding: 10px;
       text-align: left;
       color: #fff;
-      font-size: 18px; /* Increase the font size */
+      font-size: 18px;
     }
 
-    .register-container {
-      flex-grow: 1; /* Allow the container to grow and take remaining space */
+    .top-border h2 {
+      font-style: Monospace;
+      font-size: xx-large;
+      border: 2px solid white;
+      padding: 5px;
+      display: inline-block;
+    }
+
+    .form-container {
+      flex-grow: 1;
       background-color: #fff;
       padding: 20px;
       border-radius: 5px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       text-align: left;
-      margin: 10px 20px; /* Updated margin values */
-      border-top: 5px solid #42b72a;
+      margin: 10px 20px;
+      border-top: 5px solid #FFA500;
       display: flex;
-      flex-direction: column; /* Align form vertically */
-      align-items: flex-start; /* Align form elements to the left */
+      flex-direction: column;
+      align-items: flex-start;
     }
 
-    .register-container h1 {
+    .form-container h1 {
       font-size: 24px;
       margin-bottom: 20px;
     }
 
-    .register-container label {
+    .form-container label {
       display: inline-block;
       width: 120px;
       margin-bottom: 10px;
@@ -48,8 +56,8 @@
       text-align: left;
     }
 
-    .register-container input[type="text"],
-    .register-container input[type="password"] {
+    .form-container input[type="text"],
+    .form-container input[type="password"] {
       width: 200px;
       padding: 8px;
       margin-bottom: 10px;
@@ -58,10 +66,10 @@
       font-size: 14px;
     }
 
-    .register-container button[type="submit"] {
+    .form-container button[type="submit"] {
       width: 100%;
       padding: 10px;
-      background-color: #42b72a;
+      background-color: #FFA500;
       color: #fff;
       border: none;
       border-radius: 3px;
@@ -70,7 +78,7 @@
     }
 
     footer {
-      background-color: #42b72a;
+      background-color: #FFA500;
       padding: 10px;
       text-align: center;
       color: #fff;
@@ -79,13 +87,12 @@
 </head>
 <body>
   <div class="top-border">
-    <h2>Register</h2>
-  </div>
-  <div class="center-text">
-    CanV
-    Furniture
+    <a href="{{ url_for('home') }}" class="home-link">
+      <h2>CanV Furniture</h2>
+    </a>
   </div>
 
+  <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, message in messages %}
@@ -98,7 +105,7 @@
     {% endif %}
   {% endwith %}
 
-  <div class="register-container">
+  <div class="form-container">
     <h1>Register</h1>
     <form action="/register" method="POST">
       <label for="name">Name:</label>
@@ -122,6 +129,7 @@
       <button type="submit">Register</button>
     </form>
   </div>
+
   <footer>
     <p>&copy; 2023 CanV Store. All rights reserved.</p>
   </footer>

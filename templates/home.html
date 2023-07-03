@@ -19,9 +19,9 @@
     }
 
     .top-border {
-      background-color: #42b72a;
+      background-color: #FFA500;
       padding: 10px;
-      text-align: left;
+      text-align: center;
       color: #fff;
       display: flex;
       justify-content: space-between;
@@ -75,12 +75,37 @@
       object-fit: contain;
       max-height: 200px;
     }
+
+    footer {
+      background-color: #555;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    footer ul {
+      display: flex;
+      justify-content: center;
+      padding: 0;
+      margin: 0;
+    }
+
+    footer li {
+      margin: 0 10px;
+    }
+
+    footer a {
+      color: #fff;
+      text-decoration: none;
+    }
   </style>
     
 </head>
 <body>
   <div class="top-border">
-    <h2>CanV Furniture</h2>
+    <a href="{{ url_for('home') }}" class="home-link">
+      <h2>CanV Furniture</h2>
+    </a>
     <div>
       <ul>
         <li><a href="{{ url_for('register') }}" class="register">Register</a></li>
@@ -109,15 +134,22 @@
     <section class="product-listing">
       {% for product in products %}
       <div class="product">
-        <a>
-        <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}">
-        <h2>{{ product.name }}</h2>
-      </a>
+        <a href="{{ url_for('product_page', name=product.name) }}">
+          <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}">
+          <h2>{{ product.name }}</h2>
+        </a>
       </div>
       {% endfor %}
     </section>
   </main>
+  
   <footer>
+    <ul>
+      <li><a href="{{ url_for('contact_us') }}">Contact Us</a></li>
+      <li><a href="{{ url_for('feedback') }}">Feedback</a></li>
+      <li><a href="{{ url_for('faq') }}">FAQ</a></li>
+      <li><a href="{{ url_for('admin_login') }}">Admin</a></li>
+    </ul>
     <p>&copy; 2023 CanV Store. All rights reserved.</p>
   </footer>
 </body>
