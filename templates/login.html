@@ -5,44 +5,60 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 10;
+      margin: 0;
       background-color: #f2f2f2;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
     .top-border {
-      background-color: #42b72a;
+      background-color: #FFA500;
       padding: 10px;
       text-align: left;
       color: #fff;
+      font-size: 18px;
     }
 
-    .login-container {
+    .top-border h2 {
+      font-style: Monospace;
+      font-size: xx-large;
+      border: 2px solid white;
+      padding: 5px;
+      display: inline-block;
+    }
+
+    .form-container {
+      flex-grow: 1;
       background-color: #fff;
       padding: 20px;
       border-radius: 5px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      position: absolute;
-      top: 120px;
-      right: 20px;
-      border-top: 5px solid #42b72a;
+      text-align: left;
+      margin: 10px 20px;
+      border-top: 5px solid #FFA500;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
     }
 
-    .login-container h1 {
+    .form-container h1 {
       font-size: 24px;
       margin-bottom: 20px;
     }
 
-    .login-container label {
-      display: block;
+    .form-container label {
+      display: inline-block;
+      width: 120px;
       margin-bottom: 10px;
       font-size: 14px;
       font-weight: bold;
+      text-align: left;
     }
 
-    .login-container input[type="text"],
-    .login-container input[type="password"] {
-      width: 100%;
+    .form-container input[type="text"],
+    .form-container input[type="password"] {
+      width: 200px;
       padding: 8px;
       margin-bottom: 10px;
       border: 1px solid #ddd;
@@ -50,56 +66,46 @@
       font-size: 14px;
     }
 
-    .login-container button[type="submit"] {
+    .form-container button[type="submit"] {
       width: 100%;
       padding: 10px;
-      background-color: #42b72a;
+      background-color: #FFA500;
       color: #fff;
       border: none;
       border-radius: 3px;
       font-size: 16px;
       cursor: pointer;
     }
-    .center-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      border: 2px solid #42b72a;
-      border-radius: 10px;
-      padding: 20px;
-      font-size: 100px;
-      color: #42b72a;
+
+    footer {
+      background-color: #FFA500;
+      padding: 10px;
+      text-align: center;
+      color: #fff;
     }
   </style>
 </head>
 <body>
   <div class="top-border">
-    <h2>Login</h2>
+    <a href="{{ url_for('home') }}" class="home-link">
+      <h2>CanV Furniture</h2>
+    </a>
   </div>
-  <div class="center-text">
-    CanV
-    Furniture
-  </div>
-  
-  <!-- ... Your existing code ... -->
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-  {% for category, message in messages %}
-    {% if category == 'success' %}
-      <div class="flash-message success">{{ message }}</div>
-    {% else %}
-      <div class="flash-message danger">{{ message }}</div>
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        {% if category == 'success' %}
+          <div class="flash-message success">{{ message }}</div>
+        {% else %}
+          <div class="flash-message danger">{{ message }}</div>
+        {% endif %}
+      {% endfor %}
     {% endif %}
-  {% endfor %}
-{% endif %}
-{% endwith %}
+  {% endwith %}
 
-<!-- ... Your existing code ... -->
-
-
-  <div class="login-container">
+  <div class="form-container">
     <h1>Login</h1>
     {% if user_email %}
       <p>Welcome, {{ user_email }}</p>
@@ -116,9 +122,9 @@
       </form>
     {% endif %}
   </div>
+
   <footer>
     <p>&copy; 2023 CanV Store. All rights reserved.</p>
   </footer>
 </body>
 </html>
-

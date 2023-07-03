@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <!-- Add any necessary CSS stylesheets and JavaScript files here -->
+    <style>
+        /* Add your custom styles here */
+    </style>
+</head>
+<body>
+    <h1>Welcome, Admin</h1>
+
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('customer_details') }}">Customer Details</a></li>
+            <li><a href="{{ url_for('add_product') }}">Add Product</a></li>
+            <li><a href="{{ url_for('edit_product') }}">Edit Product</a></li>
+            <!-- Add more options as needed -->
+        </ul>
+    </nav>
+
+    <!-- Add any additional HTML content or scripts here -->
+</body>
+</html>
