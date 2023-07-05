@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Customer Details</title>
+    <!-- Add any necessary CSS stylesheets and JavaScript files here -->
+    <style>
+        /* Add your custom styles here */
+        table {
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid black;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Customer Details</h1>
+
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Contact</th>
+            <th>Email</th>
+            <!-- Add more table headers as needed -->
+        </tr>
+        {% for customer in customers %}
+        <tr>
+            <td>{{ customer[0] }}</td>
+            <td>{{ customer[1] }}</td>
+            <td>{{ customer[2] }}</td>
+            <td>{{ customer[3] }}</td>
+            <!-- Display additional customer details as table cells -->
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- Add any additional HTML content or scripts here -->
+</body>
+</html>
+

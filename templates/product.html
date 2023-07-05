@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>CanV Store - Product Listing</title>
+  <title>CanV Store - Product Page</title>
   <style>
     /* CSS styles go here */
     body {
@@ -19,9 +19,9 @@
     }
 
     .top-border {
-      background-color: #42b72a;
+      background-color: #FFA500;
       padding: 10px;
-      text-align: left;
+      text-align: center;
       color: #fff;
       display: flex;
       justify-content: space-between;
@@ -39,6 +39,23 @@
       margin-left: 10px;
     }
 
+    .search-wrapper {
+      display: flex;
+      align-items: center;
+      margin-left: auto;
+    }
+
+    .search-wrapper form {
+      margin-left: 10px;
+    }
+
+    .search-wrapper input[type="text"] {
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+
     .product-listing {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -50,6 +67,7 @@
       border: 1px solid #ccc;
       padding: 10px;
       text-align: center;
+      background-color: #FFA500;
     }
 
     .product img {
@@ -58,23 +76,23 @@
       object-fit: contain;
       max-height: 200px;
     }
-
-    .product-info {
-      margin-top: 10px;
-    }
-
-    .product-info p {
-      font-weight: bold;
-    }
   </style>
 </head>
 <body>
   <div class="top-border">
-    <h2>CanV Furniture</h2>
+    <a href="{{ url_for('home') }}" class="home-link">
+      <h2>CanV Furniture</h2>
+    </a>
     <div>
       <ul>
         <li><a href="{{ url_for('register') }}" class="register">Register</a></li>
-        <li><a href="{{ url_for('login') }}" class="login">Login</a></li>
+        {% if user_email %}
+          <li>
+            <p>Welcome, {{ user_email }}</p>
+            <a href="{{ logout_button_url }}">{{ logout_button_text }}</a></li>
+        {% else %}
+          <li><a href="{{ url_for('login') }}" class="login">Login</a></li>
+        {% endif %}      
       </ul>
     </div>
     <div class="search-wrapper">
@@ -91,22 +109,27 @@
 
   <main>
     <section class="product-listing">
-      {% for product in products %}
+      {% for image in images %}
       <div class="product">
-        <a href="{{ url_for('product_page', id=product.id) }}">
-          <img src="{{ url_for('static', filename='{{ product.name }}/' + product.image) }}" alt="{{ product.name }}">
-        </a>
-        <div class="product-info">
-          <h2>{{ product.name }}</h2>
-          <p>Price: ${{ product.price }}</p>
-        </div>
+        <img src="{{ url_for('static', filename=product_name.lower().replace(' ', '_') + '/' + image) }}" alt="Product Image">
+        <h2>{{ product_name }}</h2>
+        <p>Product description goes here.</p>
+        <p>Price: $XX.XX</p>
+        <p>Rating: X.X</p>
       </div>
       {% endfor %}
     </section>
   </main>
+
   
   <footer>
-    <p>&copy; 2023 CanV Store. All rights reserved.</p>
+      <ul>
+        <li><a href="{{ url_for('contact_us') }}">Contact Us</a></li>
+        <li><a href="{{ url_for('feedback') }}">Feedback</a></li>
+        <li><a href="{{ url_for('faq') }}">FAQ</a></li>
+        <li><a href="{{ url_for('admin_login') }}">Admin</a></li>
+      </ul>
+      <p>&copy; 2023 CanV Store. All rights reserved.</p>
   </footer>
 </body>
 </html>
