@@ -21,6 +21,36 @@
             max-height: 300px;
         }
     </style>
+    <script>
+        function previewImage(event) {
+            var preview = document.getElementById('preview');
+            var file = event.target.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function () {
+                preview.src = reader.result;
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '';
+            }
+        }
+
+        function updatePreview() {
+            var title = document.getElementById('title').value;
+            var price = document.getElementById('price').value;
+            var description = document.getElementById('description').value;
+            var previewTitle = document.getElementById('preview-title');
+            var previewPrice = document.getElementById('preview-price');
+            var previewDescription = document.getElementById('preview-description');
+
+            previewTitle.textContent = title;
+            previewPrice.textContent = price;
+            previewDescription.textContent = description;
+        }
+    </script>
 </head>
 <body>
     <h1>Add Product</h1>
@@ -39,19 +69,19 @@
         <form action="{{ url_for('add_product') }}" method="post" enctype="multipart/form-data">
             <div>
                 <label for="image">Image:</label>
-                <input type="file" id="image" name="image" accept="image/*" required>
+                <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(event)" required>
             </div>
             <div>
                 <label for="title">Title:</label>
-                <input type="text" id="title" name="title" required>
+                <input type="text" id="title" name="title" oninput="updatePreview()" required>
             </div>
             <div>
                 <label for="price">Price:</label>
-                <input type="number" id="price" name="price" step="0.01" required>
+                <input type="number" id="price" name="price" step="0.01" oninput="updatePreview()" required>
             </div>
             <div>
                 <label for="description">Description:</label>
-                <textarea id="description" name="description" required></textarea>
+                <textarea id="description" name="description" oninput="updatePreview()" required></textarea>
             </div>
             <div>
                 <input type="submit" value="Add Product">
@@ -60,14 +90,10 @@
 
         <div class="preview">
             <h3>Preview</h3>
-            {% if image_filename %}
-                <img src="{{ url_for('static', filename=image_filename) }}" alt="Product Image">
-            {% else %}
-                <p>No image selected</p>
-            {% endif %}
-            <p>Title: {{ title }}</p>
-            <p>Price: {{ price }}</p>
-            <p>Description: {{ description }}</p>
+            <img id="preview" src="" alt="Product Image">
+            <p>Title: <span id="preview-title"></span></p>
+            <p>Price: <span id="preview-price"></span></p>
+            <p>Description: <span id="preview-description"></span></p>
         </div>
     </div>
 </body>
