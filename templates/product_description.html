@@ -1,43 +1,145 @@
+<!DOCTYPE html>
 <html>
 <head>
   <title>CanV Store - Product Description</title>
   <style>
-    /* CSS styles for the product description page go here */
+    /* CSS styles go here */
     body {
       font-family: Arial, sans-serif;
       margin: 10;
       background-color: #340933;
-      color: #fff;
     }
 
-    .product-image {
+    .top-border h2 {
+      font-style: Monospace;
+      font-size: xx-large;
+      border: 2px solid #340933;
+      padding: 5px;
+      display: inline-block;
+    }
+
+    .top-border {
+      background-color: #F415ED;
+      padding: 10px;
       text-align: center;
-      margin-bottom: 20px;
+      color: #340933;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .product-image img {
-      max-width: 100%;
+    .top-border ul {
+      display: flex;
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .top-border li {
+      margin-left: 10px;
+    }
+
+    .search-wrapper {
+      display: flex;
+      align-items: center;
+      margin-left: auto;
+    }
+
+    .search-wrapper form {
+      margin-left: 10px;
+    }
+
+    .search-wrapper input[type="text"] {
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+
+    .product-description {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      margin: 20px;
+    }
+
+    .product-description img {
+      max-width: 400px;
       height: auto;
       object-fit: contain;
       max-height: 400px;
     }
 
     .product-details {
+      margin-top: 20px;
       text-align: center;
+    }
+
+    .product-details h2 {
+      font-size: 24px;
+    }
+
+    .product-details p {
+      font-size: 18px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="product-image">
-    <img src="{{ image }}" alt="Product Image">
+  <div class="top-border">
+    <a href="{{ url_for('home') }}" class="home-link">
+      <h2>CanV Furniture</h2>
+    </a>
+    <div>
+      <ul>
+        <li><a href="{{ url_for('register') }}" class="register">Register</a></li>
+        {% if user_email %}
+          <li>
+            <p>Welcome, {{ user_email }}</p>
+            <a href="{{ logout_button_url }}">{{ logout_button_text }}</a></li>
+        {% else %}
+          <li><a href="{{ url_for('login') }}" class="login">Login</a></li>
+        {% endif %}      
+      </ul>
+    </div>
+    <div class="search-wrapper">
+      <form action="search.php" method="GET">
+        <input type="text" name="search" placeholder="Search for products...">
+        <button type="submit">Search</button>
+      </form>
+    </div>
   </div>
 
-  <div class="product-details">
-    <h2>{{ product_name }}</h2>
-    <p>{{ product_description }}</p>
-    <p>Price: ${{ product_price }}</p>
-    <p>Rating: {{ product_rating }}</p>
-  </div>
+  <header>
+    <h1>Welcome to CanV Store</h1>
+  </header>
+
+  <main>
+    <div class="product-description">
+      <img src="{{ url_for('static', filename=image) }}" alt="Product Image">
+      <div class="product-details">
+        <div class="product-price">
+          <p>Price: ${{ price }}</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <main>
+    <section class="product-listing">
+      {% for image in images %}
+      <div class="product">
+        <a href="product_description.html?image={{ url_for('static', filename=product_name.lower().replace(' ', '_') + '/' + image) }}&name={{ product_name }}&description={{ product_description }}&price={{ product_price }}&rating={{ product_rating }}">
+          <img src="{{ url_for('static', filename=product_name.lower().replace(' ', '_') + '/' + image) }}" alt="Product Image">
+          
+           
+        
+        </a>
+      </div>
+      {% endfor %}
+    </section>
+  </main>
 
   <footer>
     <ul>

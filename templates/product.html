@@ -1,28 +1,8 @@
-
+<!DOCTYPE html>
 <html>
 <head>
   <title>CanV Store - Product Page</title>
   <style>
-    a:link {
-      color: green;
-      background-color: transparent;
-      text-decoration: none;
-    }
-    a:visited {
-      color: pink;
-      background-color: transparent;
-      text-decoration: none;
-    }
-    a:hover {
-      color: red;
-      background-color: transparent;
-      text-decoration: underline;
-    }
-    a:active {
-      color: yellow;
-      background-color: transparent;
-      text-decoration: underline;
-    }
     /* CSS styles go here */
     body {
       font-family: Arial, sans-serif;
@@ -126,29 +106,30 @@
     <h1>Welcome to CanV Store</h1>
   </header>
 
+
   <main>
     <section class="product-listing">
-      {% for image in images %}
+      {% for product in product_info %}
       <div class="product">
-        <a href="product_description.html?image={{ url_for('static', filename=product_name.lower().replace(' ', '_') + '/' + image) }}&name={{ product_name }}&description={{ product_description }}&price={{ product_price }}&rating={{ product_rating }}">
-          <img src="{{ url_for('static', filename=product_name.lower().replace(' ', '_') + '/' + image) }}" alt="Product Image">
-          <p>Product description goes here.</p>
-          <p>Price: $XX.XX</p>
-          <p>Rating: X.X</p>
+        <a href="#">
+          <img src="{{ url_for('static', filename=product.image) }}" alt="Product Image">
+          <p>Title: {{ product.title }}</p>
+          <p>Price: {{ product.price }}</p>
         </a>
       </div>
       {% endfor %}
     </section>
   </main>
   
+
   <footer>
-      <ul>
-        <li><a href="{{ url_for('contact_us') }}">Contact Us</a></li>
-        <li><a href="{{ url_for('feedback') }}">Feedback</a></li>
-        <li><a href="{{ url_for('faq') }}">FAQ</a></li>
-        <li><a href="{{ url_for('admin_login') }}">Admin</a></li>
-      </ul>
-      <p>&copy; 2023 CanV Store. All rights reserved.</p>
+    <ul>
+      <li><a href="{{ url_for('contact_us') }}">Contact Us</a></li>
+      <li><a href="{{ url_for('feedback') }}">Feedback</a></li>
+      <li><a href="{{ url_for('faq') }}">FAQ</a></li>
+      <li><a href="{{ url_for('admin_login') }}">Admin</a></li>
+    </ul>
+    <p>&copy; 2023 CanV Store. All rights reserved.</p>
   </footer>
 </body>
 </html>

@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "123"
-app.config['UPLOAD_FOLDER'] = 'static/product_images'
+app.config['UPLOAD_FOLDER'] = 'static'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
 # Create the customer table if it doesn't exist
@@ -17,6 +17,11 @@ con.close()
 con_admin = sqlite3.connect("admin_login.db")
 con_admin.execute("CREATE TABLE IF NOT EXISTS admin_login(pid INTEGER PRIMARY KEY, email TEXT, password TEXT)")
 con_admin.close()
+
+# Create the product details table if doesn't exist
+con_products = sqlite3.connect("products.db")
+con_products.execute("CREATE TABLE IF NOT EXISTS products(id INTEGER PRIMARY KEY, title TEXT, price REAL, description TEXT, category TEXT, image_path TEXT)")
+con_products.close()
 
 @app.route('/')
 def home():
@@ -31,7 +36,6 @@ def home():
     ]
     
     if 'user_id' in session:
-        # User is logged in
         user_email = session['email']
         logout_button_text = 'Logout'
         logout_button_url = url_for('logout')
@@ -109,8 +113,6 @@ def logout():
     
     flash("Logged out successfully", "success")
     return redirect(url_for('home'))
-
-
 @app.route('/product')
 def product_page():
     # Logic to fetch product details for the given name
@@ -122,18 +124,99 @@ def product_page():
     # Retrieve all image files in the folder
     images = [f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f))]
 
-    return render_template('product.html', images=images, product_name=name)
+    con = sqlite3.connect("products.db")
+    cur = con.cursor()
 
-@app.route('/product_description', methods=['GET'])
+    product_info = []
+
+    for image in images:
+        print(image)
+        separator = "\\"
+        result = (name + separator + image).lower().replace(" ", "_") # Convert result to lowercase string
+        print(result)
+        # Retrieve product information from the database
+        cur.execute("SELECT title, price FROM products WHERE image_path = ?", (result,))
+        product_data = cur.fetchall()
+
+        if product_data:
+            # If a match is found, retrieve the title and price
+            title, price = product_data[0]
+
+            # Add the product information to the list
+            product_info.append({"image": f"{name.lower().replace(' ', '_')}/{image}", "title": title, "price": price})
+
+    # Close the connection
+    con.close()
+
+    # Render the template with the combined list of images and product info
+    return render_template('product.html', product_info=product_info)
+
+
+
+@app.route('/add_product', methods=['GET', 'POST'])
+def add_product():
+    if request.method == 'POST':
+        try:
+            # Process form data
+            title = request.form['title']
+            price = request.form['price']
+            description = request.form['description']
+            category = request.form['category']
+            image = request.files['image']
+
+            # Save the product image and get the image path
+            if image and allowed_file(image.filename):
+                image_path = save_product_image(image, category)
+            else:
+                flash("Invalid file format. Please choose a valid image file.", "danger")
+                return redirect(url_for('add_product'))
+
+            con_products = sqlite3.connect("products.db")
+            cur_products = con_products.cursor()
+            cur_products.execute("INSERT INTO products(title, price, description, category, image_path) VALUES (?, ?, ?, ?, ?)",
+                                 (title, price, description, category, image_path))
+            con_products.commit()
+            con_products.close()
+
+            flash("Product added successfully", "success")
+            # Stay on the same page after form submission
+            return redirect(url_for('add_product'))
+        except sqlite3.Error:
+            flash("Error in adding product", "danger")
+
+    return render_template('add_product.html')
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+def save_product_image(image, category):
+    filename = secure_filename(image.filename)
+    category_folder = os.path.join(app.config['UPLOAD_FOLDER'], category.lower().replace(" ", "_"))
+    os.makedirs(category_folder, exist_ok=True)
+    filepath = os.path.join(category_folder, filename)
+    image.save(filepath)
+
+    # Update the image path to include only the relative path
+    image_path = os.path.join(category.lower().replace(" ", "_"), filename)
+    return image_path
+
+
+@app.route('/product_description')
 def product_description():
     # Retrieve the product information from the URL parameters
-    #product_image = request.args.get('image')
-   # product_name = request.args.get('name')
-    #product_description = request.args.get('description')
-   # product_price = request.args.get('price')
-   # product_rating = request.args.get('rating')
+    product_image = request.args.get('image')
+    product_name = request.args.get('name')
+    product_description = request.args.get('description')
+    product_price = request.args.get('price')
+    product_rating = request.args.get('rating')
 
-    return render_template('product_description.html')
+    return render_template('product_description.html', 
+                           image=product_image, 
+                           name=product_name,
+                           description=product_description,
+                           price=product_price,
+                           rating=product_rating)
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_login():
@@ -190,47 +273,6 @@ def customer_details():
     # Render the customer_details.html template and pass the customers data
     return render_template('customer_details.html', customers=customers)
 
-
-
-@app.route('/add_product', methods=['GET', 'POST'])
-def add_product():
-    if request.method == 'POST':
-        try:
-            title = request.form['title']
-            price = request.form['price']
-            description = request.form['description']
-            image = request.files['image']
-
-            # Save the product image and get the image path
-            if image and allowed_file(image.filename):
-                image_path = save_product_image(image)
-            else:
-                flash("Invalid file format. Please choose a valid image file.", "danger")
-                return redirect(url_for('add_product'))
-
-            con = sqlite3.connect("database.db")
-            cur = con.cursor()
-            cur.execute("INSERT INTO product(title, price, description, image_path) VALUES (?, ?, ?, ?)",
-                        (title, price, description, image_path))
-            con.commit()
-            con.close()
-
-            flash("Product added successfully", "success")
-            return redirect(url_for('home'))
-        except sqlite3.Error:
-            flash("Error in adding product", "danger")
-
-    return render_template('add_product.html')
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
-
-def save_product_image(image):
-    filename = secure_filename(image.filename)
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    image.save(filepath)
-    return filepath
 
 @app.route('/edit_product', methods=['GET', 'POST'])
 def edit_product():
