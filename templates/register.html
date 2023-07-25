@@ -2,6 +2,10 @@
 <html>
 <head>
   <title>Register</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,18 +16,10 @@
       min-height: 100vh;
     }
 
-    .top-border {
-      background-color: #FFA500;
-      padding: 10px;
-      text-align: left;
-      color: #fff;
-      font-size: 18px;
-    }
-
     .top-border h2 {
       font-style: Monospace;
       font-size: xx-large;
-      border: 2px solid white;
+      border: 2px solid #f2f2f2;
       padding: 5px;
       display: inline-block;
     }
@@ -61,15 +57,16 @@
       width: 200px;
       padding: 8px;
       margin-bottom: 10px;
-      border: 1px solid #ddd;
+      border: 1px solid #FFA500;
       border-radius: 3px;
       font-size: 14px;
     }
 
     .form-container button[type="submit"] {
-      width: 100%;
+      width: 200px;
       padding: 10px;
       background-color: #FFA500;
+      margin-left: 38%;
       color: #fff;
       border: none;
       border-radius: 3px;
@@ -86,11 +83,59 @@
   </style>
 </head>
 <body>
-  <div class="top-border">
-    <a href="{{ url_for('home') }}" class="home-link">
-      <h2>CanV Furniture</h2>
-    </a>
-  </div>
+  <nav class=" w3-black navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('home') }}">
+        <div class="w3-container">
+          <span class="w3-tag w3-xlarge"> </span>
+          <span class="w3-tag w3-xlarge"> </span>
+          <span class="w3-tag w3-xlarge"> </span>
+          <span class="w3-tag w3-xlarge w3-red">C</span>
+          <span class="w3-tag w3-xlarge">A</span>
+          <span class="w3-tag w3-xlarge w3-yellow">N</span>
+          <span class="w3-tag w3-xlarge">V</span>
+        </div>
+        <div>
+          <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">F</span>
+          <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">U</span>
+          <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">R</span>
+          <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">N</span>
+          <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">I</span>
+          <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">T</span>
+          <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">U</span>
+          <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">R</span>
+          <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">E</span>
+          <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">S</span>
+        </div>
+      </a>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('register') }}">
+              <span class="w3-tag w3-large w3-padding w3-red" style="transform:rotate(-5deg)">
+                Register
+                </span>
+            </a>
+          </li>
+          {% if user_email %}
+            <li class="nav-item">
+              <i class="glyphicon glyphicon-trash"></i>
+              <p class="nav-link">Welcome, {{ user_email }}</p>
+              <a class="nav-link" href="{{ logout_button_url }}">{{ logout_button_text }}</a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('login') }}">
+                <span class="w3-tag w3-large w3-padding w3-blue" style="transform:rotate(-5deg)">
+                  Login
+                  </span>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
 
   <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}

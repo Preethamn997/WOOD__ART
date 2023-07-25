@@ -1,135 +1,108 @@
-<!DOCTYPE html>
 <html>
 <head>
-  <title>CanV Store - Product Page</title>
+  <title>CanV Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <!-- Your custom styles specific to this page go here -->
   <style>
-    /* CSS styles go here */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 10;
-      background-color: #340933;
-    }
-
-    .top-border h2 {
-      font-style: Monospace;
-      font-size: xx-large;
-      border: 2px solid #340933;
-      padding: 5px;
-      display: inline-block;
-    }
-
-    .top-border {
-      background-color: #F415ED;
-      padding: 10px;
-      text-align: center;
-      color: #340933;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .top-border ul {
-      display: flex;
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .top-border li {
-      margin-left: 10px;
-    }
-
-    .search-wrapper {
-      display: flex;
-      align-items: center;
-      margin-left: auto;
-    }
-
-    .search-wrapper form {
-      margin-left: 10px;
-    }
-
-    .search-wrapper input[type="text"] {
-      padding: 5px;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-      font-size: 14px;
-    }
-
-    .product-listing {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      margin: 20px;
-    }
-
-    .product {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
-    }
-
-    .product img {
-      max-width: 100%;
-      height: auto;
-      object-fit: contain;
-      max-height: 200px;
-    }
+    /* Additional styles specific to this page */
   </style>
 </head>
 <body>
-  <div class="top-border">
-    <a href="{{ url_for('home') }}" class="home-link">
-      <h2>CanV Furniture</h2>
+<!-- Rest of the home page content remains unchanged -->
+<nav class=" w3-black navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('home') }}">
+      <div class="w3-container">
+        <span class="w3-tag w3-xlarge"> </span>
+        <span class="w3-tag w3-xlarge"> </span>
+        <span class="w3-tag w3-xlarge"> </span>
+        <span class="w3-tag w3-xlarge w3-red">C</span>
+        <span class="w3-tag w3-xlarge">A</span>
+        <span class="w3-tag w3-xlarge w3-yellow">N</span>
+        <span class="w3-tag w3-xlarge">V</span>
+      </div>
+      <div>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">F</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">U</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">R</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">N</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">I</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">T</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">U</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">R</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">E</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">S</span>
+      </div>
     </a>
-    <div>
-      <ul>
-        <li><a href="{{ url_for('register') }}" class="register">Register</a></li>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('register') }}">
+            <span class="w3-tag w3-large w3-padding w3-red" style="transform:rotate(-5deg)">
+              Register
+              </span>
+          </a>
+        </li>
         {% if user_email %}
-          <li>
-            <p>Welcome, {{ user_email }}</p>
-            <a href="{{ logout_button_url }}">{{ logout_button_text }}</a></li>
+          <li class="nav-item">
+            <i class="glyphicon glyphicon-trash"></i>
+            <p class="nav-link">Welcome, {{ user_email }}</p>
+            <a class="nav-link" href="{{ logout_button_url }}">{{ logout_button_text }}</a>
+          </li>
         {% else %}
-          <li><a href="{{ url_for('login') }}" class="login">Login</a></li>
-        {% endif %}      
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login') }}">
+              <span class="w3-tag w3-large w3-padding w3-blue" style="transform:rotate(-5deg)">
+                Login
+                </span>
+            </a>
+          </li>
+        {% endif %}
       </ul>
     </div>
-    <div class="search-wrapper">
-      <form action="search.php" method="GET">
-        <input type="text" name="search" placeholder="Search for products...">
-        <button type="submit">Search</button>
-      </form>
-    </div>
   </div>
-
-  <header>
-    <h1>Welcome to CanV Store</h1>
-  </header>
+</nav>
 
 
-  <main>
-    <section class="product-listing">
-      {% for product in product_info %}
-      <div class="product">
-        <a href="#">
-          <img src="{{ url_for('static', filename=product.image) }}" alt="Product Image">
-          <p>Title: {{ product.title }}</p>
-          <p>Price: {{ product.price }}</p>
-        </a>
-      </div>
-      {% endfor %}
-    </section>
-  </main>
+<header>
   
+</header>
 
-  <footer>
-    <ul>
-      <li><a href="{{ url_for('contact_us') }}">Contact Us</a></li>
-      <li><a href="{{ url_for('feedback') }}">Feedback</a></li>
-      <li><a href="{{ url_for('faq') }}">FAQ</a></li>
-      <li><a href="{{ url_for('admin_login') }}">Admin</a></li>
-    </ul>
-    <p>&copy; 2023 CanV Store. All rights reserved.</p>
-  </footer>
+<main>
+  <section class="product-listing">
+    {% for product in product_info %}
+    <div class="product">
+      <a href="product_description.html?image={{ url_for('static', filename=product.image) }}&title={{ product.title }}&description={{ product.description }}&price={{ product.price }}">
+        <img src="{{ url_for('static', filename=product.image) }}" alt="Product Image">
+        <p class="title">{{ product.title }}</p>
+        <p class="price">Rs: {{ product.price }}</p>  
+      </a>  
+    </div>
+    {% endfor %}
+  </section>
+</main>
+
+<footer class="bg-dark text-white text-center py-4">
+  <ul class="nav justify-content-center">
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('contact_us') }}">Contact Us</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('feedback') }}">Feedback</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('faq') }}">FAQ</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('admin_login') }}">Admin</a>
+    </li>
+  </ul>
+  <p>&copy; 2023 CanV Store. All rights reserved.</p>
+</footer>
+</body>
+</html>
 </body>
 </html>

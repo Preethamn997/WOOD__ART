@@ -1,9 +1,9 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, session
+from flask import Flask, render_template, request, flash, redirect, url_for, session, send_from_directory
 import sqlite3
 import os
 from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 app.secret_key = "123"
 app.config['UPLOAD_FOLDER'] = 'static'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
@@ -32,6 +32,9 @@ def home():
         {'name': 'INTERIOR', 'image': 'homepics/interior.jpg'},
         {'name': 'SOFA CUM BED', 'image': 'homepics/sofacumbed.jpg'},
         {'name': 'KITCHEN INTERIOR', 'image': 'homepics/kitchen_interior1.jpg'},
+        {'name': 'BOOK RACK', 'image' : 'homepics/book_rack.jpg'},
+        {'name': 'BOSS CHAIR', 'image' : 'homepics/boss_chair.jpg'},
+        {'name': 'CENTER TABLE', 'image' : 'homepics/center_table.jpg'}
         # Add more product listings here
     ]
     
@@ -135,15 +138,15 @@ def product_page():
         result = (name + separator + image).lower().replace(" ", "_") # Convert result to lowercase string
         print(result)
         # Retrieve product information from the database
-        cur.execute("SELECT title, price FROM products WHERE image_path = ?", (result,))
+        cur.execute("SELECT title, price, description FROM products WHERE image_path = ?", (result,))
         product_data = cur.fetchall()
 
         if product_data:
-            # If a match is found, retrieve the title and price
-            title, price = product_data[0]
+            # If a match is found, retrieve the title, price, and description
+            title, price, description = product_data[0]
 
             # Add the product information to the list
-            product_info.append({"image": f"{name.lower().replace(' ', '_')}/{image}", "title": title, "price": price})
+            product_info.append({"image": f"{name.lower().replace(' ', '_')}/{image}", "title": title, "price": price, "description": description})
 
     # Close the connection
     con.close()
@@ -201,22 +204,21 @@ def save_product_image(image, category):
     image_path = os.path.join(category.lower().replace(" ", "_"), filename)
     return image_path
 
-
-@app.route('/product_description')
+@app.route('/product_description.html')
 def product_description():
     # Retrieve the product information from the URL parameters
     product_image = request.args.get('image')
-    product_name = request.args.get('name')
+    product_title = request.args.get('title')
     product_description = request.args.get('description')
     product_price = request.args.get('price')
-    product_rating = request.args.get('rating')
 
     return render_template('product_description.html', 
                            image=product_image, 
-                           name=product_name,
+                           title=product_title,
                            description=product_description,
-                           price=product_price,
-                           rating=product_rating)
+                           price=product_price)
+
+
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_login():
@@ -297,6 +299,18 @@ def faq():
     # Logic for handling the FAQ page
     # ...
     return render_template('faq.html')
+
+@app.route('/add_to_cart')
+def add_to_cart():
+    # Logic to add the product to the cart
+    # ...
+    return redirect(url_for('product_description.html'))
+
+@app.route('/cart')
+def cart():
+    # Logic to display the cart items and perform cart operations
+    # ...
+    return render_template('cart.html')
 
 
 if __name__ == '__main__':

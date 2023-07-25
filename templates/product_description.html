@@ -1,154 +1,182 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>CanV Store - Product Description</title>
+  <meta charset="UTF-8">
+  <title>CanV Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <!-- Your custom styles specific to this page go here -->
   <style>
-    /* CSS styles go here */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 10;
-      background-color: #340933;
-    }
-
-    .top-border h2 {
-      font-style: Monospace;
-      font-size: xx-large;
-      border: 2px solid #340933;
-      padding: 5px;
-      display: inline-block;
-    }
-
-    .top-border {
-      background-color: #F415ED;
-      padding: 10px;
-      text-align: center;
-      color: #340933;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .top-border ul {
-      display: flex;
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .top-border li {
-      margin-left: 10px;
-    }
-
-    .search-wrapper {
+    /* Additional styles specific to this page */
+    .product-container {
       display: flex;
       align-items: center;
-      margin-left: auto;
     }
-
-    .search-wrapper form {
-      margin-left: 10px;
+    .product-image {
+      flex: 1;
+      margin-left: 8%;
     }
-
-    .search-wrapper input[type="text"] {
-      padding: 5px;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-      font-size: 14px;
-    }
-
-    .product-description {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      margin: 20px;
-    }
-
-    .product-description img {
-      max-width: 400px;
-      height: auto;
-      object-fit: contain;
-      max-height: 400px;
-    }
-
     .product-details {
-      margin-top: 20px;
-      text-align: center;
+      flex: 2;
+      padding-left: 20px;
     }
 
-    .product-details h2 {
-      font-size: 24px;
+    @media (max-width: 768px) {
+      .product-container {
+        flex-direction: column;
+      }
+      .product-image {
+        margin-left: 0;
+        margin-bottom: 20px;
+      }
+      .product-details {
+        padding-left: 0;
+      }
     }
 
-    .product-details p {
-      font-size: 18px;
-      margin-top: 10px;
+    input[type="number"],
+    input[type="text"] {
+      width: 100px; /* You can adjust the width as per your preference */
+    }
+
+    .product-details h2,
+    .product-details form,
+    .product-details label,
+    .product-details input,
+    .product-details button {
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="top-border">
-    <a href="{{ url_for('home') }}" class="home-link">
-      <h2>CanV Furniture</h2>
+<!-- Rest of the home page content remains unchanged -->
+<nav class="w3-black navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('home') }}">
+      <div class="w3-container">
+        <span class="w3-tag w3-xlarge w3-red">C</span>
+        <span class="w3-tag w3-xlarge">A</span>
+        <span class="w3-tag w3-xlarge w3-yellow">N</span>
+        <span class="w3-tag w3-xlarge">V</span>
+      </div>
+      <div>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">F</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">U</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">R</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">N</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">I</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">T</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">U</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">R</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">E</span>
+        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">S</span>
+      </div>
     </a>
-    <div>
-      <ul>
-        <li><a href="{{ url_for('register') }}" class="register">Register</a></li>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
         {% if user_email %}
-          <li>
-            <p>Welcome, {{ user_email }}</p>
-            <a href="{{ logout_button_url }}">{{ logout_button_text }}</a></li>
+          <li class="nav-item">
+            <i class="glyphicon glyphicon-trash"></i>
+            <p class="nav-link">Welcome, {{ user_email }}</p>
+            <a class="nav-link" href="{{ logout_button_url }}">{{ logout_button_text }}</a>
+          </li>
         {% else %}
-          <li><a href="{{ url_for('login') }}" class="login">Login</a></li>
-        {% endif %}      
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login') }}">
+              <span class="w3-tag w3-large w3-padding w3-blue" style="transform:rotate(-5deg)">
+                Login
+              </span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('register') }}">
+              <span class="w3-tag w3-large w3-padding w3-red" style="transform:rotate(-5deg)">
+                Register
+              </span>
+            </a>
+          </li>
+        {% endif %}
       </ul>
     </div>
-    <div class="search-wrapper">
-      <form action="search.php" method="GET">
-        <input type="text" name="search" placeholder="Search for products...">
-        <button type="submit">Search</button>
-      </form>
-    </div>
   </div>
+</nav>
 
-  <header>
-    <h1>Welcome to CanV Store</h1>
-  </header>
+<header>
+</header>
 
-  <main>
-    <div class="product-description">
-      <img src="{{ url_for('static', filename=image) }}" alt="Product Image">
-      <div class="product-details">
-        <div class="product-price">
-          <p>Price: ${{ price }}</p>
+<main>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="product-container">
+          <div class="product-image">
+            <img src="{{ image }}" alt="Product Image">
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="product-details">
+          <h2>{{ title }}</h2>
+          <h2>{{ price }}</h2>
+          <form action="{{ url_for('add_to_cart') }}" method="post">
+            <div class="mb-3">
+              <label for="quantity">Quantity:</label>
+              <input type="number" id="quantity" name="quantity" min="1" value="1">
+            </div>
+            <div class="mb-3">
+              <label for="pincode">Enter Pincode:</label>
+              <input type="text" id="pincode" name="pincode" maxlength="6" pattern="[0-9]{6}" placeholder="e.g., 123456" required>
+              <button type="submit" class="btn btn-primary">Check</button>
+            </div>
+            <button type="submit" class="btn btn-primary">Add to Cart</button>
+          </form>
+          <div class="mt-4">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab" aria-controls="description" aria-selected="true">Description</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="specifications-tab" data-bs-toggle="tab" data-bs-target="#specifications" type="button" role="tab" aria-controls="specifications" aria-selected="false">Specifications</button>
+              </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+              <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+                <p>{{ description }}</p>
+              </div>
+              <div class="tab-pane fade" id="specifications" role="tabpanel" aria-labelledby="specifications-tab">
+                <p>{{ specifications }}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </main>
+  </div>
+</main>
 
-  <main>
-    <section class="product-listing">
-      {% for image in images %}
-      <div class="product">
-        <a href="product_description.html?image={{ url_for('static', filename=product_name.lower().replace(' ', '_') + '/' + image) }}&name={{ product_name }}&description={{ product_description }}&price={{ product_price }}&rating={{ product_rating }}">
-          <img src="{{ url_for('static', filename=product_name.lower().replace(' ', '_') + '/' + image) }}" alt="Product Image">
-          
-           
-        
-        </a>
-      </div>
-      {% endfor %}
-    </section>
-  </main>
+<footer class="bg-dark text-white text-center py-4">
+  <ul class="nav justify-content-center">
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('contact_us') }}">Contact Us</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('feedback') }}">Feedback</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('faq') }}">FAQ</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('admin_login') }}">Admin</a>
+    </li>
+  </ul>
+  <p>&copy; 2023 CanV Store. All rights reserved.</p>
+</footer>
 
-  <footer>
-    <ul>
-      <li><a href="{{ url_for('contact_us') }}">Contact Us</a></li>
-      <li><a href="{{ url_for('feedback') }}">Feedback</a></li>
-      <li><a href="{{ url_for('faq') }}">FAQ</a></li>
-      <li><a href="{{ url_for('admin_login') }}">Admin</a></li>
-    </ul>
-    <p>&copy; 2023 CanV Store. All rights reserved.</p>
-  </footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
