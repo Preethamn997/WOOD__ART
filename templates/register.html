@@ -87,13 +87,14 @@
     <div class="container">
       <a class="navbar-brand" href="{{ url_for('home') }}">
         <div class="w3-container">
+          <span class="w3-tag w3-xlarge w3-yellow">W</span>
+          <span class="w3-tag w3-xlarge">O</span>
+          <span class="w3-tag w3-xlarge">O</span>
+          <span class="w3-tag w3-xlarge w3-red">D</span>
           <span class="w3-tag w3-xlarge"> </span>
-          <span class="w3-tag w3-xlarge"> </span>
-          <span class="w3-tag w3-xlarge"> </span>
-          <span class="w3-tag w3-xlarge w3-red">C</span>
-          <span class="w3-tag w3-xlarge">A</span>
-          <span class="w3-tag w3-xlarge w3-yellow">N</span>
-          <span class="w3-tag w3-xlarge">V</span>
+          <span class="w3-tag w3-xlarge">L</span>
+          <span class="w3-tag w3-xlarge w3-yellow">O</span>
+          <span class="w3-tag w3-xlarge">G</span>
         </div>
         <div>
           <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">F</span>
@@ -136,7 +137,6 @@
       </div>
     </div>
   </nav>
-
   <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}

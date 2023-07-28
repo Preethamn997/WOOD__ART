@@ -14,6 +14,8 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      
+      
     }
 
     .top-border h2 {
@@ -31,11 +33,13 @@
       border-radius: 5px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       text-align: left;
-      margin: 10px 20px;
+      
       border-top: 5px solid #FFA500;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
+      max-width: 400px; /* Add this line to limit the maximum width */
+      margin: 0 auto;
     }
 
     .form-container h1 {
@@ -87,13 +91,14 @@
     <div class="container">
       <a class="navbar-brand" href="{{ url_for('home') }}">
         <div class="w3-container">
+          <span class="w3-tag w3-xlarge w3-yellow">W</span>
+          <span class="w3-tag w3-xlarge">O</span>
+          <span class="w3-tag w3-xlarge">O</span>
+          <span class="w3-tag w3-xlarge w3-red">D</span>
           <span class="w3-tag w3-xlarge"> </span>
-          <span class="w3-tag w3-xlarge"> </span>
-          <span class="w3-tag w3-xlarge"> </span>
-          <span class="w3-tag w3-xlarge w3-red">C</span>
-          <span class="w3-tag w3-xlarge">A</span>
-          <span class="w3-tag w3-xlarge w3-yellow">N</span>
-          <span class="w3-tag w3-xlarge">V</span>
+          <span class="w3-tag w3-xlarge">L</span>
+          <span class="w3-tag w3-xlarge w3-yellow">O</span>
+          <span class="w3-tag w3-xlarge">G</span>
         </div>
         <div>
           <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">F</span>

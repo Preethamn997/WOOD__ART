@@ -5,9 +5,23 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <!-- Your custom styles specific to this page go here -->
   <style>
     /* Additional styles specific to this page */
+    .card-img-top {
+      object-fit: cover; /* Ensure images fit within the card */
+      height: 200px; /* Set a fixed height for all images */
+    }
+  
+    .navbar-nav .nav-item .nav-link {
+      color: #fff; /* Set the font color to white */
+    }
+
+    /* Custom styles for the shopping cart icon */
+    .shopping-cart {
+       color: #fff; /* Set the font color to white */
+    }
   </style>
 </head>
 <body>
@@ -16,15 +30,16 @@
   <div class="container">
     <a class="navbar-brand" href="{{ url_for('home') }}">
       <div class="w3-container">
-        <span class="w3-tag w3-xlarge"> </span>
-        <span class="w3-tag w3-xlarge"> </span>
-        <span class="w3-tag w3-xlarge"> </span>
-        <span class="w3-tag w3-xlarge w3-red">C</span>
-        <span class="w3-tag w3-xlarge">A</span>
-        <span class="w3-tag w3-xlarge w3-yellow">N</span>
-        <span class="w3-tag w3-xlarge">V</span>
+        <span class="w3-tag w3-large w3-yellow">W</span>
+        <span class="w3-tag w3-large">O</span>
+        <span class="w3-tag w3-large">O</span>
+        <span class="w3-tag w3-large w3-red">D</span>
+        <span class="w3-tag w3-large"> </span>
+        <span class="w3-tag w3-large">L</span>
+        <span class="w3-tag w3-large w3-yellow">O</span>
+        <span class="w3-tag w3-large">G</span>
       </div>
-      <div>
+     <!-- <div>
         <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">F</span>
         <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">U</span>
         <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">R</span>
@@ -35,32 +50,32 @@
         <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">R</span>
         <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">E</span>
         <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">S</span>
-      </div>
+      </div>-->
     </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('register') }}">
-            <span class="w3-tag w3-large w3-padding w3-red" style="transform:rotate(-5deg)">
               Register
-              </span>
           </a>
         </li>
         {% if user_email %}
           <li class="nav-item">
-            <i class="glyphicon glyphicon-trash"></i>
-            <p class="nav-link">Welcome, {{ user_email }}</p>
             <a class="nav-link" href="{{ logout_button_url }}">{{ logout_button_text }}</a>
           </li>
         {% else %}
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('login') }}">
-              <span class="w3-tag w3-large w3-padding w3-blue" style="transform:rotate(-5deg)">
-                Login
-                </span>
-            </a>
+            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
           </li>
         {% endif %}
+        <li class="nav-item">
+          <a class="shopping-cart" href="{{url_for('cart')}}">
+            <i class="fa fa-shopping-cart" style="font-size:24px;color:red"></i>
+          </a>
+        </li>
       </ul>
     </div>
   </div>
