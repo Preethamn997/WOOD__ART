@@ -13,9 +13,7 @@
       background-color: #f2f2f2;
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
-      
-      
+      min-height: 100vh;  
     }
 
     .top-border h2 {
@@ -84,6 +82,14 @@
       text-align: center;
       color: #fff;
     }
+    .navbar-nav .nav-item .nav-link {
+      color: #fff; /* Set the font color to white */
+    }
+
+    /* Custom styles for the shopping cart icon */
+    .shopping-cart {
+       color: #fff; /* Set the font color to white */
+    }
   </style>
 </head>
 <body>
@@ -91,16 +97,16 @@
     <div class="container">
       <a class="navbar-brand" href="{{ url_for('home') }}">
         <div class="w3-container">
-          <span class="w3-tag w3-xlarge w3-yellow">W</span>
-          <span class="w3-tag w3-xlarge">O</span>
-          <span class="w3-tag w3-xlarge">O</span>
-          <span class="w3-tag w3-xlarge w3-red">D</span>
-          <span class="w3-tag w3-xlarge"> </span>
-          <span class="w3-tag w3-xlarge">L</span>
-          <span class="w3-tag w3-xlarge w3-yellow">O</span>
-          <span class="w3-tag w3-xlarge">G</span>
+          <span class="w3-tag w3-large w3-yellow">W</span>
+          <span class="w3-tag w3-large">O</span>
+          <span class="w3-tag w3-large">O</span>
+          <span class="w3-tag w3-large w3-red">D</span>
+          <span class="w3-tag w3-large"> </span>
+          <span class="w3-tag w3-large">L</span>
+          <span class="w3-tag w3-large w3-yellow">O</span>
+          <span class="w3-tag w3-large">G</span>
         </div>
-        <div>
+       <!-- <div>
           <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">F</span>
           <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">U</span>
           <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">R</span>
@@ -111,37 +117,37 @@
           <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">R</span>
           <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">E</span>
           <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">S</span>
-        </div>
+        </div>-->
       </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('register') }}">
-              <span class="w3-tag w3-large w3-padding w3-red" style="transform:rotate(-5deg)">
                 Register
-                </span>
             </a>
           </li>
           {% if user_email %}
             <li class="nav-item">
-              <i class="glyphicon glyphicon-trash"></i>
-              <p class="nav-link">Welcome, {{ user_email }}</p>
               <a class="nav-link" href="{{ logout_button_url }}">{{ logout_button_text }}</a>
             </li>
           {% else %}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('login') }}">
-                <span class="w3-tag w3-large w3-padding w3-blue" style="transform:rotate(-5deg)">
-                  Login
-                  </span>
-              </a>
+              <a class="nav-link" href="{{ url_for('login') }}">Login</a>
             </li>
           {% endif %}
+          <li class="nav-item">
+            <a class="shopping-cart" href="{{url_for('cart')}}">
+              <i class="fa fa-shopping-cart" style="font-size:24px;color:red"></i>
+            </a>
+          </li>
         </ul>
       </div>
     </div>
   </nav>
-
+  
 
   <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
@@ -171,11 +177,36 @@
         <br>
         <button type="submit">Log In</button>
       </form>
+      <p>Not registered yet? <a href="{{ url_for('register') }}">Register here</a>.</p>
     {% endif %}
   </div>
-
-  <footer>
-    <p>&copy; 2023 CanV Store. All rights reserved.</p>
-  </footer>
+  
+  <footer class="bg-dark text-white text-center py-4">
+    <ul class="nav justify-content-center">
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('contact_us') }}">Contact Us</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('feedback') }}">Feedback</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('faq') }}">FAQ</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('admin_login') }}">Admin</a>
+      </li>
+    </ul>
+  
+    <ul class="nav justify-content-right">
+      <li class="nav-item">
+        <a href="#" class="fa fa-facebook"></a>
+      </li class="nav-item">
+      <li>
+        <a href="#" class="fa fa-twitter"></a>
+      </li>
+      <li class="nav-item"> 
+        <a href="#" class="fa fa-youtube"></a>
+      </li>
+    </ul>
 </body>
 </html>

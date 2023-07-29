@@ -10,7 +10,20 @@ app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
 # Create the customer table if it doesn't exist
 con = sqlite3.connect("database.db")
-con.execute("CREATE TABLE IF NOT EXISTS customer(pid INTEGER PRIMARY KEY, name TEXT, address TEXT, contact TEXT, mail TEXT, password TEXT)")
+con.execute("""
+    CREATE TABLE IF NOT EXISTS customer (
+        pid INTEGER PRIMARY KEY,
+        name TEXT,
+        address1 TEXT,
+        address2 TEXT,
+        city TEXT,
+        pincode TEXT,
+        state TEXT,
+        contact TEXT,
+        mail TEXT UNIQUE,
+        password TEXT
+    )
+""")
 con.close()
 
 # Create the admin login table if it doesn't exist
@@ -49,7 +62,6 @@ def home():
         logout_button_url = ''
     
     return render_template('home.html', products=products, user_email=user_email, logout_button_text=logout_button_text, logout_button_url=logout_button_url)
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -64,10 +76,10 @@ def login():
         
         if user:
             # User exists, check password
-            if password == user[5]:
+            if password == user[9]:  # Corrected index to get the password from the query result
                 # Password matches, set session variables
                 session['user_id'] = user[0]
-                session['email'] = user[4]
+                session['email'] = user[8]  # Corrected index to get the email from the query result
                 
                 flash("Login Successful", "success")
                 con.close()
@@ -78,24 +90,34 @@ def login():
     return render_template('login.html')
 
 
+
+# Flask route for registration
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         try:
             name = request.form['name']
-            address = request.form['address']
+            address1 = request.form['address1']
+            address2 = request.form['address2']
+            city = request.form['city']
+            pincode = request.form['pincode']
+            state = request.form['state']
             contact = request.form['contact']
             mail = request.form['mail']
             password = request.form['password']
             confirm_password = request.form['confirm_password']
             
+            # Validate other form fields (e.g., password matching, email uniqueness, etc.)
+            # Add your validation logic here if needed
+
             if password != confirm_password:
                 flash("Password and Confirm Password do not match", "danger")
                 return redirect(url_for('register'))
 
             con = sqlite3.connect("database.db")
             cur = con.cursor()
-            cur.execute("INSERT INTO customer(name, address, contact, mail, password) VALUES (?, ?, ?, ?, ?)", (name, address, contact, mail, password))
+            cur.execute("INSERT INTO customer(name, address1, address2, city, pincode, state, contact, mail, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (name, address1, address2, city, pincode, state, contact, mail, password))
             con.commit()
             con.close()
             
@@ -300,11 +322,27 @@ def faq():
     # ...
     return render_template('faq.html')
 
-@app.route('/add_to_cart')
+@app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
-    # Logic to add the product to the cart
-    # ...
-    return redirect(url_for('product_description.html'))
+    # Check if the user is logged in
+    if 'user_id' not in session:
+        # User is not logged in, redirect to the login page
+        flash("Please login to add products to your cart.", "info")
+        return redirect(url_for('login'))
+
+    # Get the product details from the form
+    product_id = request.form.get('product_id')
+    quantity = int(request.form.get('quantity'))
+
+    # Now, you can add the product to the cart or perform any other logic you need
+    # For example, you can store the cart items in the session or a database
+
+    # Here, we'll just show a success message
+    flash(f"Added {quantity} product(s) to cart.", "success")
+
+    # Redirect back to the product description page
+    # Modify this URL to include the necessary parameters as per your setup
+    return redirect(url_for('product_description', product_id=product_id))
 
 @app.route('/cart')
 def cart():
