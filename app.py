@@ -57,11 +57,12 @@ def home():
         logout_button_url = url_for('logout')
     else:
         # User is not logged in
-        user_email = ''
-        logout_button_text = ''
-        logout_button_url = ''
-    
+        user_email = None
+        logout_button_text = None
+        logout_button_url = None
+
     return render_template('home.html', products=products, user_email=user_email, logout_button_text=logout_button_text, logout_button_url=logout_button_url)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -138,6 +139,8 @@ def logout():
     
     flash("Logged out successfully", "success")
     return redirect(url_for('home'))
+
+
 @app.route('/product')
 def product_page():
     # Logic to fetch product details for the given name
@@ -349,6 +352,33 @@ def cart():
     # Logic to display the cart items and perform cart operations
     # ...
     return render_template('cart.html')
+
+def get_user_profile(user_id):
+    con = sqlite3.connect("database.db")
+    cur = con.cursor()
+    cur.execute("SELECT name, address1, address2, city, pincode, state, contact, mail FROM customer WHERE pid = ?", (user_id,))
+    user_profile = cur.fetchone()
+    con.close()
+    if user_profile:
+        profile_keys = ["name", "address1", "address2", "city", "pincode", "state", "contact", "mail"]
+        return dict(zip(profile_keys, user_profile))
+    return None
+
+
+@app.route('/profile')
+def profile():
+    if 'user_id' not in session:
+        flash("Please login to view your profile.", "info")
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    user_profile = get_user_profile(user_id)
+
+    if user_profile:
+        return render_template('profile.html', user=user_profile)
+    else:
+        flash("User profile not found", "danger")
+        return redirect(url_for('home'))
 
 
 if __name__ == '__main__':

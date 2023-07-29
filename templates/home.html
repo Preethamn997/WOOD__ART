@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <!-- Your custom styles specific to this page go here -->
   <style>
     /* Additional styles specific to this page */
@@ -20,7 +21,8 @@
 
     /* Custom styles for the shopping cart icon */
     .shopping-cart {
-       color: #fff; /* Set the font color to white */
+      margin-top: 10px;
+      color: #fff; /* Set the font color to white */
     }
   </style>
 </head>
@@ -62,15 +64,17 @@
               Register
           </a>
         </li>
-        {% if user_email %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ logout_button_url }}">{{ logout_button_text }}</a>
-          </li>
-        {% else %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
-          </li>
-        {% endif %}
+      {% if user_email %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('profile') }}">
+            <i class="glyphicon glyphicon-user">Profile
+          </a></i>
+        </li>
+      {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+        </li>
+      {% endif %}        
         <li class="nav-item">
           <a class="shopping-cart" href="{{url_for('cart')}}">
             <i class="fa fa-shopping-cart" style="font-size:24px;color:red"></i>

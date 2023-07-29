@@ -64,7 +64,13 @@
         </li>
         {% if user_email %}
           <li class="nav-item">
-            <a class="nav-link" href="{{ logout_button_url }}">{{ logout_button_text }}</a>
+            <a class="nav-link" href="{{ logout_button_url }}">{{ logout_button_text }} profile
+            </a>
+          </li>
+          <li>
+            <a class="nav-link" href="{{profile}}">
+             Profile
+            </a>
           </li>
         {% else %}
           <li class="nav-item">
