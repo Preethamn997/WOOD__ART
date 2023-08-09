@@ -501,10 +501,11 @@ def cart():
         cart_items = cur_cart.fetchall()
         con_cart.close()
 
-        return render_template('cart.html', cart_items=cart_items)
+        return render_template('cart.html', cart_items=cart_items)  # Passing cart_items to the template
     else:
         flash("Please log in to view your cart", "info")
         return redirect(url_for('login'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
