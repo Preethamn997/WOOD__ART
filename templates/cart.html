@@ -39,92 +39,119 @@
 
   </style>
 </head>
-</head>
 <body>
-<!-- Rest of the home page content remains unchanged -->
-<nav class="w3-black navbar navbar-expand-lg navbar-light bg-light">
-  <div class="container">
-    <a class="navbar-brand" href="{{ url_for('home') }}">
-      <div class="w3-container">
-        <span class="w3-tag w3-large w3-yellow">W</span>
-        <span class="w3-tag w3-large">O</span>
-        <span class="w3-tag w3-large">O</span>
-        <span class="w3-tag w3-large w3-red">D</span>
-        <span class="w3-tag w3-large"> </span>
-        <span class="w3-tag w3-large">L</span>
-        <span class="w3-tag w3-large w3-yellow">O</span>
-        <span class="w3-tag w3-large">G</span>
-      </div>
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('register') }}">
-              Register
+    <nav class="w3-black navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+          <a class="navbar-brand" href="{{ url_for('home') }}">
+            <div class="w3-container">
+              <span class="w3-tag w3-large w3-yellow">W</span>
+              <span class="w3-tag w3-large">O</span>
+              <span class="w3-tag w3-large">O</span>
+              <span class="w3-tag w3-large w3-red">D</span>
+              <span class="w3-tag w3-large"> </span>
+              <span class="w3-tag w3-large">L</span>
+              <span class="w3-tag w3-large w3-yellow">O</span>
+              <span class="w3-tag w3-large">G</span>
+            </div>
           </a>
-        </li>
-        {% if user_email %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('profile') }}">
-              Profile
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('logout') }}">
-              Logout
-            </a>
-          </li>
-        {% else %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
-          </li>
-        {% endif %}
-        <li class="nav-item">
-          <a class="shopping-cart" href="{{ url_for('cart') }}">
-            <i class="fa fa-shopping-cart" style="font-size: 24px"></i>
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('register') }}">
+                    Register
+                </a>
+              </li>
+              {% if user_email %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('logout') }}">{{ logout_button_text }}</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('profile') }}">
+                    Profile
+                  </a>
+                </li>
+              {% else %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                </li>
+              {% endif %}
+              <li class="nav-item">
+                <a class="shopping-cart" href="{{ url_for('cart') }}">
+                  <i class="fa fa-shopping-cart" style="font-size: 24px"></i>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
     <header>
         <!-- Header content -->
     </header>
 
+    
     <main>
-        <div class="container">
-            <h2>Your Cart</h2>
-            <table class="table">
-                <tbody>
-                    {% for cart_item in cart_items %}
-                        <tr>
-                            <td>
-                                <div class="image-container">
-                                    <img src="{{ url_for('static', filename=cart_item[5].replace('\\', '/')) }}" alt="Product Image" width="75" height="75">
-                                </div>
-                            </td>
-                            <td>{{ cart_item[0] }}</td>
-                            <td>{{ cart_item[1] }}</td>
-                            <td>{{ cart_item[2] }}</td>
-                            <td>{{ cart_item[3] }}</td>
-                            <td>Rs.{{ cart_item[4] * cart_item[3] }}</td> <!-- Calculate and display subtotal -->
-                        </tr>
-                    {% endfor %}
-
-                </tbody>
-            </table>
-            <form method="post" action="{{ url_for('cart') }}">
-                <!-- Form to update cart quantities or remove items -->
-                <button type="submit" class="btn btn-primary">Update Cart</button>
-            </form>
-        </div>
-    </main>
-
+      <div class="container">
+          <h2 class="mt-4">My Cart</h2>
+          <div class="row">
+              <div class="col-md-8">
+                  <div class="cart-items">
+                      {% for cart_item in cart_items %}
+                      <div class="cart-item mb-3">
+                          <div class="cart-item-details">
+                              <img src="{{ url_for('static', filename=cart_item[5].replace('\\', '/')) }}" alt="Product Image" class="cart-item-image" width="50">
+                              <h4>{{ cart_item[1] }}</h4>
+                              <p>Price: Rs. {{ cart_item[4] }}</p>
+                              <form method="post" action="{{ url_for('update_cart', item_id=cart_item[0]) }}" class="d-flex">
+                                  <input type="number" name="quantity" value="{{ cart_item[3] }}" min="1" class="form-control me-2" style="width: 70px;">
+                                  <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                              </form>
+                              <form method="post" action="{{ url_for('remove_from_cart', item_id=cart_item[0]) }}">
+                                  <button type="submit" class="btn btn-danger btn-sm mt-2">Remove</button>
+                              </form>
+                              <p class="text-end">Subtotal: Rs. {{ cart_item[3] * cart_item[4] }}</p> <!-- Align subtotal to the right -->
+                          </div>
+                      </div>
+                      {% endfor %}
+                  </div>
+              </div>
+              <div class="col-md-4">
+                <div class="cart-summary">
+                  <h4>Cart Summary</h4>
+                  <p>Total Items: {{ cart_items|length }}</p>
+                  <p>Total Amount: Rs. {{ total_amount }}</p>
+                  <button id="checkout-btn">Checkout</button>
+              </div>
+              
+              <!-- Include the Stripe JavaScript library -->
+              <script src="https://js.stripe.com/v3/"></script>
+              <script>
+                  document.getElementById('checkout-btn').addEventListener('click', function () {
+                      // Make a request to your Flask route to create a checkout session
+                      fetch('/create-checkout-session', {
+                          method: 'POST',
+                      })
+                      .then(function(response) {
+                          return response.json();
+                      })
+                      .then(function(data) {
+                          // Initialize Stripe
+                          var stripe = Stripe('pk_test_51NgQuDSFWaBWl4suQ1WyM8Ud8AoqGpmqcybCNpRdsmeAhUI1EB9L8L9qIbX7pbbM2y8IDtKQKumpPw1AWBV1b0pe00qxQoMdLV');
+                          
+                          // Redirect to the Stripe checkout page
+                          stripe.redirectToCheckout({
+                              sessionId: data.sessionId
+                          });
+                      });
+                  });
+              </script>
+              </div>
+          </div>
+      </div>
+  </main>
+    
     <footer>
         <!-- Footer content -->
     </footer>

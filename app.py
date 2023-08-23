@@ -1,12 +1,17 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, session, send_from_directory
+from flask import Flask, render_template, request, flash, redirect, url_for, session, send_from_directory, jsonify
 import sqlite3
 import os
 from werkzeug.utils import secure_filename
+import stripe
+
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = "123"
+stripe.api_key = 'sk_test_51NgQuDSFWaBWl4suxeSpzmVVZHXPhJKr8oWBPq298xPCBaNnX3Ltiyqg6sGZwjxg39acW3dpossLG6eiV5nrSoum00F82l97z9'
 app.config['UPLOAD_FOLDER'] = 'static'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
+
+YOUR_DOMAIN = "http://localhost:5000"
 
 # Create the customer table if it doesn't exist
 con = sqlite3.connect("database.db")
@@ -491,9 +496,10 @@ def add_to_cart():
 
 @app.route('/cart')
 def cart():
-    if 'user_id' in session:
+    user_email = session.get('email')
+    if user_email:
         user_id = session['user_id']
-        
+
         # Fetch products in the user's cart from the cart table
         con_cart = sqlite3.connect("cart.db")
         cur_cart = con_cart.cursor()
@@ -501,10 +507,102 @@ def cart():
         cart_items = cur_cart.fetchall()
         con_cart.close()
 
-        return render_template('cart.html', cart_items=cart_items)  # Passing cart_items to the template
+        # Calculate total amount
+        total_amount = sum(item[3] * item[4] for item in cart_items)
+
+        return render_template('cart.html', cart_items=cart_items, user_email=user_email, total_amount=total_amount)
     else:
         flash("Please log in to view your cart", "info")
         return redirect(url_for('login'))
+
+@app.route('/remove_from_cart/<int:item_id>', methods=['POST'])
+def remove_from_cart(item_id):
+    # Check if the user is logged in
+    if 'user_id' in session:
+        user_id = session['user_id']
+        
+        # Delete the item from the cart table based on item_id and user_id
+        con_cart = sqlite3.connect("cart.db")
+        cur_cart = con_cart.cursor()
+        cur_cart.execute("DELETE FROM cart WHERE id = ? AND user_id = ?", (item_id, user_id))
+        con_cart.commit()
+        con_cart.close()
+
+        flash("Item removed from cart", "success")
+    
+    # Redirect back to the cart page
+    return redirect(url_for('cart'))
+
+@app.route('/update_cart/<int:item_id>', methods=['POST'])
+def update_cart(item_id):
+    # Check if the user is logged in
+    if 'user_id' in session:
+        user_id = session['user_id']
+        new_quantity = int(request.form.get('quantity', 1))  # Get the new quantity from the form
+        
+        # Update the quantity of the item in the cart table based on item_id and user_id
+        con_cart = sqlite3.connect("cart.db")
+        cur_cart = con_cart.cursor()
+        cur_cart.execute("UPDATE cart SET quantity = ? WHERE id = ? AND user_id = ?", (new_quantity, item_id, user_id))
+        con_cart.commit()
+        con_cart.close()
+
+        flash("Quantity updated in cart", "success")
+    
+    # Redirect back to the cart page
+    return redirect(url_for('cart'))
+
+
+def calculate_total_amount(cart_items):
+    total_amount = 0
+    for item in cart_items:
+        total_amount += item['quantity'] * item['price']
+    return total_amount
+
+@app.route('/create-checkout-session', methods=['POST'])
+def create_checkout_session():
+    # Retrieve the cart items and total amount from the session
+    cart_items = session.get('cart_items', [])
+    total_amount = calculate_total_amount(cart_items)
+
+    # Create a Stripe checkout session
+    stripe_session = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        line_items=[
+            {
+                'price_data': {
+                    'currency': 'inr',  # Change to your desired currency
+                    'unit_amount': int(total_amount * 100),  # Stripe requires amount in cents
+                    'product_data': {
+                        'name': 'Your Cart',
+                        'images': ['https://example.com/cart-icon.png'],  # Replace with an actual image URL
+                    },
+                },
+                'quantity': 1,
+            },
+        ],
+        mode='payment',
+        success_url=YOUR_DOMAIN + '/payment-success',  # Redirect URL after successful payment
+        cancel_url=YOUR_DOMAIN + '/cart',  # Redirect URL if payment is canceled
+    )
+
+    return jsonify({'sessionId': stripe_session.id, 'totalAmount': total_amount})
+
+
+@app.route('/payment-success')
+def payment_success():
+    # Clear the cart items from the session after successful payment
+    session.pop('cart_items', None)
+
+    flash("Payment successful. Thank you for your purchase!", "success")
+    return redirect(url_for('home'))
+
+
+@app.route('/payment-cancelled')
+def payment_cancelled():
+    flash("Payment cancelled.", "info")
+    return redirect(url_for('cart'))
+
 
 
 if __name__ == '__main__':
