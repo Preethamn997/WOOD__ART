@@ -509,6 +509,7 @@ def cart():
 
         # Calculate total amount
         total_amount = sum(item[3] * item[4] for item in cart_items)
+        print("Total amount", total_amount)
 
         return render_template('cart.html', cart_items=cart_items, user_email=user_email, total_amount=total_amount)
     else:
@@ -554,10 +555,20 @@ def update_cart(item_id):
 
 
 def calculate_total_amount(cart_items):
-    total_amount = 0
-    for item in cart_items:
-        total_amount += item['quantity'] * item['price']
-    return total_amount
+    user_email = session.get('email')
+    if user_email:
+        user_id = session['user_id']
+
+        # Fetch products in the user's cart from the cart table
+        con_cart = sqlite3.connect("cart.db")
+        cur_cart = con_cart.cursor()
+        cur_cart.execute("SELECT id, title, category, quantity, price, image_path FROM cart WHERE user_id = ?", (user_id,))
+        cart_items = cur_cart.fetchall()
+        con_cart.close()
+
+        # Calculate total amount
+        total_amount = sum(item[3] * item[4] for item in cart_items)
+        return total_amount
 
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
@@ -602,7 +613,6 @@ def payment_success():
 def payment_cancelled():
     flash("Payment cancelled.", "info")
     return redirect(url_for('cart'))
-
 
 
 if __name__ == '__main__':
