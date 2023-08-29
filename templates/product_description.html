@@ -28,38 +28,27 @@
 <!-- Rest of the home page content remains unchanged -->
 <nav class=" w3-black navbar navbar-expand-lg navbar-light bg-light">
   <div class="container">
-    <a class="navbar-brand" href="{{ url_for('home') }}">
-      <div class="w3-container">
-        <span class="w3-tag w3-large w3-yellow">W</span>
-        <span class="w3-tag w3-large">O</span>
-        <span class="w3-tag w3-large">O</span>
-        <span class="w3-tag w3-large w3-red">D</span>
-        <span class="w3-tag w3-large"> </span>
-        <span class="w3-tag w3-large">L</span>
-        <span class="w3-tag w3-large w3-yellow">O</span>
-        <span class="w3-tag w3-large">G</span>
-      </div>
-     <!-- <div>
-        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">F</span>
-        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">U</span>
-        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">R</span>
-        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">N</span>
-        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">I</span>
-        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">T</span>
-        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">U</span>
-        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">R</span>
-        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">E</span>
-        <span class="w3-tag w3-medium" style="transform:rotate(-5deg)">S</span>
-      </div>-->
-    </a>
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('home') }}">
+        <div class="w3-container">
+          <span class="w3-tag w3-large w3-yellow">W</span>
+          <span class="w3-tag w3-large">O</span>
+          <span class="w3-tag w3-large">O</span>
+          <span class="w3-tag w3-large w3-red">D</span>
+          <span class="w3-tag w3-large"> </span>
+          <span class="w3-tag w3-large">L</span>
+          <span class="w3-tag w3-large w3-yellow">O</span>
+          <span class="w3-tag w3-large">G</span>
+        </div>
+      </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('register') }}">
-              Register
+          <a class="nav-link" href="{{ url_for('home') }}">
+              Home
           </a>
         </li>
         {% if user_email %}
@@ -68,12 +57,17 @@
           </li>
         {% else %}
           <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('register') }}">
+              Register
+            </a>
+          </li> 
+          <li class="nav-item">
             <a class="nav-link" href="{{ url_for('login') }}">Login</a>
           </li>
         {% endif %}
         <li class="nav-item">
-          <a class="shopping-cart" href="{{url_for('cart')}}">
-            <i class="fa fa-shopping-cart" style="font-size:24px;color:red"></i>
+          <a class="shopping-cart" href="{{ url_for('cart') }}">
+            <i class="fa fa-shopping-cart" style="font-size: 24px"></i>
           </a>
         </li>
       </ul>

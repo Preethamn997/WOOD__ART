@@ -3,13 +3,27 @@ import sqlite3
 import os
 from werkzeug.utils import secure_filename
 import stripe
+import bleach
+import bcrypt
+from flask_wtf.csrf import CSRFProtect
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField
+from wtforms.validators import DataRequired, Email
+from datetime import timedelta
+
+
 
 
 app = Flask(__name__, static_url_path='/static')
+csrf = CSRFProtect(app)
 app.secret_key = "123"
 stripe.api_key = 'sk_test_51NgQuDSFWaBWl4suxeSpzmVVZHXPhJKr8oWBPq298xPCBaNnX3Ltiyqg6sGZwjxg39acW3dpossLG6eiV5nrSoum00F82l97z9'
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)  # Session expires after 1 day
 app.config['UPLOAD_FOLDER'] = 'static'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
+
 
 YOUR_DOMAIN = "http://localhost:5000"
 
@@ -57,6 +71,11 @@ con_products = sqlite3.connect("products.db")
 con_products.execute("CREATE TABLE IF NOT EXISTS products(id INTEGER PRIMARY KEY, title TEXT, price REAL, description TEXT, category TEXT, image_path TEXT)")
 con_products.close()
 
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+
+
 @app.route('/')
 def home():
     products = [
@@ -90,6 +109,7 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    form = LoginForm()
     if request.method == 'POST':
         # Process login form data
         email = request.form['email']
@@ -120,16 +140,17 @@ def login():
         
         flash("Invalid email or password", "danger")
     
-    return render_template('login.html')
+    return render_template('login.html', form=form)
 
 
 
 # Flask route for registration
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    form = LoginForm()
     if request.method == 'POST':
         try:
-            name = request.form['name']
+            name = bleach.clean(request.form['name'])
             address1 = request.form['address1']
             address2 = request.form['address2']
             city = request.form['city']
@@ -139,18 +160,17 @@ def register():
             mail = request.form['mail']
             password = request.form['password']
             confirm_password = request.form['confirm_password']
-            
-            # Validate other form fields (e.g., password matching, email uniqueness, etc.)
-            # Add your validation logic here if needed
 
             if password != confirm_password:
                 flash("Password and Confirm Password do not match", "danger")
                 return redirect(url_for('register'))
-
+            
+            # Hash the password
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
             con = sqlite3.connect("database.db")
             cur = con.cursor()
             cur.execute("INSERT INTO customer(name, address1, address2, city, pincode, state, contact, mail, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        (name, address1, address2, city, pincode, state, contact, mail, password))
+                        (name, address1, address2, city, pincode, state, contact, mail, hashed_password))
             con.commit()
             con.close()
             
@@ -161,7 +181,7 @@ def register():
         except sqlite3.Error:
             flash("Error in Registration", "danger")
     
-    return render_template('register.html')
+    return render_template('register.html', form=form)
 
 @app.route('/logout')
 def logout():
@@ -171,7 +191,7 @@ def logout():
     session.pop('user_profile', None)
     
     flash("Logged out successfully", "success")
-    return redirect(url_for('home'))
+    return redirect(url_for('login'))
 
 
 
@@ -273,12 +293,10 @@ def save_product_image(image, category):
 def product_description():
     # Retrieve the product information from the URL parameters
     product_id = request.args.get('id')
-
     product_image = request.args.get('image')
-    product_title = request.args.get('title')
-    product_description = request.args.get('description')
+    product_title = bleach.clean(request.args.get('title'))
+    product_description = bleach.clean(request.args.get('description'))
     product_price = request.args.get('price')
-    print("product_id", product_id)
     # Fetch the user email and logout button text for rendering
     user_email = None
     logout_button_text = None

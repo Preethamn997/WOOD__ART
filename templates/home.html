@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <!-- Your custom styles specific to this page go here -->
-  <style>
+  <style >
     /* Additional styles specific to this page */
     .card-img-top {
       object-fit: cover; /* Ensure images fit within the card */
@@ -42,8 +42,8 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('register') }}">
-              Register
+          <a class="nav-link" href="{{ url_for('home') }}">
+              Home
           </a>
         </li>
         {% if user_email %}
@@ -58,6 +58,11 @@
             </a>
           </li>
         {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('register') }}">
+              Register
+            </a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('login') }}">Login</a>
           </li>

@@ -27,40 +27,41 @@
 </head>
 <body>
 <!-- Rest of the home page content remains unchanged -->
-<nav class="w3-black navbar navbar-expand-lg navbar-light bg-light">
+<nav class=" w3-black navbar navbar-expand-lg navbar-light bg-light">
   <div class="container">
-    <a class="navbar-brand" href="{{ url_for('home') }}">
-      <div class="w3-container">
-        <span class="w3-tag w3-large w3-yellow">W</span>
-        <span class="w3-tag w3-large">O</span>
-        <span class="w3-tag w3-large">O</span>
-        <span class="w3-tag w3-large w3-red">D</span>
-        <span class="w3-tag w3-large"> </span>
-        <span class="w3-tag w3-large">L</span>
-        <span class="w3-tag w3-large w3-yellow">O</span>
-        <span class="w3-tag w3-large">G</span>
-      </div>
-    </a>
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('home') }}">
+        <div class="w3-container">
+          <span class="w3-tag w3-large w3-yellow">W</span>
+          <span class="w3-tag w3-large">O</span>
+          <span class="w3-tag w3-large">O</span>
+          <span class="w3-tag w3-large w3-red">D</span>
+          <span class="w3-tag w3-large"> </span>
+          <span class="w3-tag w3-large">L</span>
+          <span class="w3-tag w3-large w3-yellow">O</span>
+          <span class="w3-tag w3-large">G</span>
+        </div>
+      </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('register') }}">
-              Register
+          <a class="nav-link" href="{{ url_for('home') }}">
+              Home
           </a>
         </li>
         {% if user_email %}
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('logout') }}">{{ logout_button_text }}</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('profile') }}">
-              Profile
-            </a>
+            <a class="nav-link" href="{{ logout_button_url }}">{{ logout_button_text }}</a>
           </li>
         {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('register') }}">
+              Register
+            </a>
+          </li> 
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('login') }}">Login</a>
           </li>
@@ -74,6 +75,7 @@
     </div>
   </div>
 </nav>
+
 
 <header class="text-center py-4">
   <h1>Hello!</h1>
