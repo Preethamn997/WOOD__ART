@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <!-- Your custom styles specific to this page go here -->
-  <style>
+  <style >
     /* Additional styles specific to this page */
     .card-img-top {
       object-fit: cover; /* Ensure images fit within the card */
@@ -18,30 +18,24 @@
     .navbar-nav .nav-item .nav-link {
       color: #fff; /* Set the font color to white */
     }
-
-    /* Custom styles for the shopping cart icon */
-    .shopping-cart {
-       color: #fff; /* Set the font color to white */
-    }
   </style>
 </head>
 <body>
 <!-- Rest of the home page content remains unchanged -->
-<nav class=" w3-black navbar navbar-expand-lg navbar-light bg-light">
+<nav class="w3-black navbar navbar-expand-lg navbar-light bg-light">
   <div class="container">
-    <div class="container">
-      <a class="navbar-brand" href="{{ url_for('home') }}">
-        <div class="w3-container">
-          <span class="w3-tag w3-large w3-yellow">W</span>
-          <span class="w3-tag w3-large">O</span>
-          <span class="w3-tag w3-large">O</span>
-          <span class="w3-tag w3-large w3-red">D</span>
-          <span class="w3-tag w3-large"> </span>
-          <span class="w3-tag w3-large">L</span>
-          <span class="w3-tag w3-large w3-yellow">O</span>
-          <span class="w3-tag w3-large">G</span>
-        </div>
-      </a>
+    <a class="navbar-brand" href="{{ url_for('home') }}">
+      <div class="w3-container">
+        <span class="w3-tag w3-large w3-yellow">W</span>
+        <span class="w3-tag w3-large">O</span>
+        <span class="w3-tag w3-large">O</span>
+        <span class="w3-tag w3-large w3-red">D</span>
+        <span class="w3-tag w3-large"> </span>
+        <span class="w3-tag w3-large">L</span>
+        <span class="w3-tag w3-large w3-yellow">O</span>
+        <span class="w3-tag w3-large">G</span>
+      </div>
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -54,14 +48,21 @@
         </li>
         {% if user_email %}
           <li class="nav-item">
-            <a class="nav-link" href="{{ logout_button_url }}">{{ logout_button_text }}</a>
+            <a class="nav-link" href="{{ url_for('profile') }}">
+              Profile
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}">
+              Logout
+            </a>
           </li>
         {% else %}
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('register') }}">
               Register
             </a>
-          </li> 
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('login') }}">Login</a>
           </li>
@@ -77,16 +78,11 @@
 </nav>
 
 
-<header class="text-center py-4">
-  <h1>Hello!</h1>
-</header>
-
-
 <main>
   <section class="product-listing">
     {% for product in product_info %}
     <div class="product">
-      <a href="product_description.html?image={{ url_for('static', filename=product.image) }}&titles={{ product.title }}&description={{ product.description }}&price={{ product.price }}&id={{ product.pid}}">
+      <a href="product_description.html?image={{ url_for('static', filename=product.image) }}&id={{ product.pid}}">
         <!-- Add the responsive image class here -->
         <img src="{{ url_for('static', filename=product.image) }}" alt="Product Image" class="img-fluid">
         <p class="title">{{ product.title }}</p>

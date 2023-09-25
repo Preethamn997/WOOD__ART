@@ -113,11 +113,13 @@
                               <h4>{{ cart_item[1] }}</h4>
                               <p>Price: Rs. {{ cart_item[4] }}</p>
                               <form method="post" action="{{ url_for('update_cart', item_id=cart_item[0]) }}" class="d-flex">
+                                {{ form.csrf_token }}
                                   <input type="number" name="quantity" value="{{ cart_item[3] }}" min="1" class="form-control me-2" style="width: 70px;">
                                   <button type="submit" class="btn btn-primary btn-sm">Update</button>
                               </form>
-                              <form method="post" action="{{ url_for('remove_from_cart', item_id=cart_item[0]) }}">
-                                  <button type="submit" class="btn btn-danger btn-sm mt-2">Remove</button>
+                              <form method="post" action="{{ url_for('remove_from_cart', item_id=cart_item[0]) }}"> 
+                                {{ form.csrf_token }}
+                                <button type="submit" class="btn btn-danger btn-sm mt-2">Remove</button>
                               </form>
                               <p class="text-end">Subtotal: Rs. {{ cart_item[3] * cart_item[4] }}</p> <!-- Align subtotal to the right -->
                           </div>

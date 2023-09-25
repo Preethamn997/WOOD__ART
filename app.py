@@ -10,12 +10,11 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired, Email
 from datetime import timedelta
-
-
-
+from geopy.geocoders import Nominatim
+from geopy.distance import geodesic
 
 app = Flask(__name__, static_url_path='/static')
-csrf = CSRFProtect(app)
+# csrf = CSRFProtect(app)
 app.secret_key = "123"
 stripe.api_key = 'sk_test_51NgQuDSFWaBWl4suxeSpzmVVZHXPhJKr8oWBPq298xPCBaNnX3Ltiyqg6sGZwjxg39acW3dpossLG6eiV5nrSoum00F82l97z9'
 app.config['SESSION_COOKIE_SECURE'] = True
@@ -23,7 +22,6 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)  # Session expires after 1 day
 app.config['UPLOAD_FOLDER'] = 'static'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
-
 
 YOUR_DOMAIN = "http://localhost:5000"
 
@@ -170,7 +168,7 @@ def register():
             con = sqlite3.connect("database.db")
             cur = con.cursor()
             cur.execute("INSERT INTO customer(name, address1, address2, city, pincode, state, contact, mail, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        (name, address1, address2, city, pincode, state, contact, mail, hashed_password))
+                        (name, address1, address2, city, pincode, state, contact, mail, password))
             con.commit()
             con.close()
             
@@ -289,30 +287,52 @@ def save_product_image(image, category):
     image_path = os.path.join(category.lower().replace(" ", "_"), filename)
     return image_path
 
+
+
+
 @app.route('/product_description.html')
 def product_description():
+    form = LoginForm()
     # Retrieve the product information from the URL parameters
     product_id = request.args.get('id')
     product_image = request.args.get('image')
-    product_title = bleach.clean(request.args.get('title'))
-    product_description = bleach.clean(request.args.get('description'))
-    product_price = request.args.get('price')
     # Fetch the user email and logout button text for rendering
+    user_email = None
+    logout_button_text = None
+    con = sqlite3.connect("products.db")
+    cur = con.cursor()
+    cur.execute("SELECT title, price, description FROM products WHERE id = ?", (product_id,))
+    product = cur.fetchall()
+    print("product_data", product)
+    
+    if product:
+            # If a match is found, retrieve the title, price, and description
+            title, price, description = product[0]
+
+            # Add the product information to the list
+            # product_info.append({ "title": title, "price": price, "description": description})
+            
+    
+
+    # Close the connection
+    con.close()
+
     user_email = None
     logout_button_text = None
 
     if 'user_id' in session:
         user_email = session['email']
         logout_button_text = 'Logout'
+
     return render_template('product_description.html',
-                           image=product_image,
-                           title=product_title,
-                           description=product_description,
-                           price=product_price,
                            user_email=user_email,
                            logout_button_text=logout_button_text,
-                           product_id=product_id,
-                           )
+                           title=title,
+                           price=price,
+                           description=description,
+                           product_image=product_image,
+                           form=form,
+                           product_id=product_id)
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -344,6 +364,7 @@ def admin_login():
     
     return render_template('admin_login.html')
 
+
 @app.route('/admin/dashboard')
 def admin_dashboard():
     # Check if the admin is logged in
@@ -354,6 +375,7 @@ def admin_dashboard():
         # Admin is not logged in, redirect to the admin login page
         return redirect(url_for('admin_login'))
     
+
 @app.route('/customer_details')
 def customer_details():
     # Connect to the database
@@ -376,18 +398,21 @@ def edit_product():
     # Logic for editing a product
     # ...
     return render_template('edit_product.html')
- 
+
+
 @app.route('/contact_us')
 def contact_us():
     # Logic for handling the contact us page
     # ...
     return render_template('contact_us.html')
 
+
 @app.route('/feedback')
 def feedback():
     # Logic for handling the feedback page
     # ...
     return render_template('feedback.html')
+
 
 @app.route('/faq')
 def faq():
@@ -454,8 +479,10 @@ def update_profile():
     flash("Profile updated successfully", "success")
     return redirect(url_for('profile'))
 
+
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
+    form = LoginForm()
     # Check if the user is logged in
     if 'user_id' not in session:
         flash("Please login to add products to your cart.", "info")
@@ -466,10 +493,12 @@ def add_to_cart():
     quantity = request.form.get('quantity')
     print(product_id)
     print(quantity)
+    print(request.form)
     
     # Validate product_id and quantity
     if not product_id or not quantity:
         flash("Invalid product details", "danger")
+        print("product not added to the cart")
         return redirect(url_for('home'))
     
     # Convert product_id and quantity to integers
@@ -510,29 +539,63 @@ def add_to_cart():
     referring_page = request.headers.get('Referer')
     return redirect(referring_page)
 
+@app.route('/check_availability', methods=['POST'])
+def check_availability():
+    geolocator = Nominatim(user_agent="geoapiExercises")
+    # Get the ZIP code from the form data
+    zip_code = request.form.get('zip_code')
+    location = geolocator.geocode(zip_code)
+    print("Zipcode:",zip_code)
+    print("Details of the Zipcode:")
+    print(location)
+
+    # Implement your availability checking logic here
+    # You can check the ZIP code against a database or other data source
+
+    # For demonstration, we'll assume it's available if the ZIP code is not empty
+    bangalore_coords = (12.971599, 77.594566)
+
+    # Check if the location coordinates are within a certain radius of Bangalore
+    if location:
+        user_coords = (location.latitude, location.longitude)
+        distance = geodesic(user_coords, bangalore_coords).kilometers
+        print("Distance to Bangalore:", distance)
+        
+        # Set a maximum allowed distance (adjust as needed)
+        max_distance_km = 50  # For example, within 50 km of Bangalore
+
+        if distance <= max_distance_km:
+            availability_message = "Available in bangalore"
+        else:
+            availability_message = "Not Available outside Bangalore"
+    else:
+        availability_message = "Not Available"
+
+    return jsonify({'availability_message': availability_message})
 
 
 @app.route('/cart')
 def cart():
+    form = LoginForm()
     user_email = session.get('email')
-    if user_email:
-        user_id = session['user_id']
 
-        # Fetch products in the user's cart from the cart table
-        con_cart = sqlite3.connect("cart.db")
-        cur_cart = con_cart.cursor()
-        cur_cart.execute("SELECT id, title, category, quantity, price, image_path FROM cart WHERE user_id = ?", (user_id,))
-        cart_items = cur_cart.fetchall()
-        con_cart.close()
-
-        # Calculate total amount
-        total_amount = sum(item[3] * item[4] for item in cart_items)
-        print("Total amount", total_amount)
-
-        return render_template('cart.html', cart_items=cart_items, user_email=user_email, total_amount=total_amount)
-    else:
+    if not user_email:
         flash("Please log in to view your cart", "info")
         return redirect(url_for('login'))
+
+    user_id = session['user_id']
+
+    # Fetch products in the user's cart from the cart table
+    con_cart = sqlite3.connect("cart.db")
+    cur_cart = con_cart.cursor()
+    cur_cart.execute("SELECT id, title, category, quantity, price, image_path FROM cart WHERE user_id = ?", (user_id,))
+    cart_items = cur_cart.fetchall()
+    con_cart.close()
+
+    # Calculate total amount
+    total_amount = sum(item[3] * item[4] for item in cart_items)
+
+    return render_template('cart.html', cart_items=cart_items, user_email=user_email, total_amount=total_amount, form=form)
 
 @app.route('/remove_from_cart/<int:item_id>', methods=['POST'])
 def remove_from_cart(item_id):
@@ -590,32 +653,38 @@ def calculate_total_amount(cart_items):
 
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
-    # Retrieve the cart items and total amount from the session
-    cart_items = session.get('cart_items', [])
-    total_amount = calculate_total_amount(cart_items)
+    try:
+        # Retrieve the cart items and total amount from the session
+        cart_items = session.get('cart_items', [])
+        total_amount = calculate_total_amount(cart_items)
 
-    # Create a Stripe checkout session
-    stripe_session = stripe.checkout.Session.create(
-        payment_method_types=['card'],
-        line_items=[
-            {
-                'price_data': {
-                    'currency': 'inr',  # Change to your desired currency
-                    'unit_amount': int(total_amount * 100),  # Stripe requires amount in cents
-                    'product_data': {
-                        'name': 'Your Cart',
-                        'images': ['https://example.com/cart-icon.png'],  # Replace with an actual image URL
+        # Create a Stripe checkout session
+        stripe_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[
+                {
+                    'price_data': {
+                        'currency': 'inr',  # Change to your desired currency
+                        'unit_amount': int(total_amount * 100),  # Stripe requires amount in cents
+                        'product_data': {
+                            'name': 'Your Cart',
+                              # Replace with an actual image URL
+                        },
                     },
+                    'quantity': 1,
                 },
-                'quantity': 1,
-            },
-        ],
-        mode='payment',
-        success_url=YOUR_DOMAIN + '/payment-success',  # Redirect URL after successful payment
-        cancel_url=YOUR_DOMAIN + '/cart',  # Redirect URL if payment is canceled
-    )
+            ],
+            mode='payment',
+            success_url=YOUR_DOMAIN + '/payment-success',  # Redirect URL after successful payment
+            cancel_url=YOUR_DOMAIN + '/cart',  # Redirect URL if payment is canceled  # Redirect URL if payment is canceled
+        )
 
-    return jsonify({'sessionId': stripe_session.id, 'totalAmount': total_amount})
+        return jsonify({'sessionId': stripe_session.id, 'totalAmount': total_amount})
+
+    except Exception as e:
+        # Log any exceptions that occur
+        print(f"Error creating checkout session: {str(e)}")
+        return "Error creating checkout session", 400
 
 
 @app.route('/payment-success')
