@@ -13,7 +13,8 @@
       background-color: #f2f2f2;
       display: flex;
       flex-direction: column;
-      min-height: 100vh;  
+      min-height: 100vh;
+      justify-content: space-between; /* Vertically center content */
     }
 
     .top-border h2 {
@@ -25,19 +26,14 @@
     }
 
     .form-container {
-      flex-grow: 1;
       background-color: #fff;
       padding: 20px;
       border-radius: 5px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       text-align: left;
-      
-      border-top: 5px solid #FFA500;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      max-width: 400px; /* Add this line to limit the maximum width */
+      max-width: 500px;
       margin: 0 auto;
+      overflow: hidden; /* Prevent content from overflowing */
     }
 
     .form-container h1 {
@@ -46,17 +42,25 @@
     }
 
     .form-container label {
-      display: inline-block;
-      width: 120px;
-      margin-bottom: 10px;
+      display: block; /* Display labels on a new line */
       font-size: 14px;
       font-weight: bold;
-      text-align: left;
+      margin-bottom: 5px;
+    }
+
+    .form-container form[action="/resend_otp"] button[type="submit"] {
+      background-color: transparent; /* Remove box color */
+      color: #FFA500; /* Text color */
+      border: none;
+      border-radius: 3px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px; /* Add spacing */
     }
 
     .form-container input[type="text"],
     .form-container input[type="password"] {
-      width: 200px;
+      width: 100%; /* Take up full container width */
       padding: 8px;
       margin-bottom: 10px;
       border: 1px solid #FFA500;
@@ -65,8 +69,7 @@
     }
 
     .form-container button[type="submit"] {
-      width: 200px;
-      margin-left: 38%;
+      width: 100%; /* Take up full container width */
       padding: 5px;
       background-color: #FFA500;
       color: #fff;
@@ -82,13 +85,14 @@
       text-align: center;
       color: #fff;
     }
+
     .navbar-nav .nav-item .nav-link {
-      color: #fff; /* Set the font color to white */
+      color: #fff;
     }
 
     /* Custom styles for the shopping cart icon */
     .shopping-cart {
-       color: #fff; /* Set the font color to white */
+      color: #fff;
     }
   </style>
 </head>
@@ -147,7 +151,6 @@
       </div>
     </div>
   </nav>
-  
 
   <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
@@ -173,17 +176,23 @@
         {{ form.hidden_tag() }}
         <label for="otp">Enter OTP:</label>
         <input id="otp" name="otp" type="text" required> 
-        <br>
+
+        {% if otp_expiry_time %}
+            <p>OTP will expire in: {{ (otp_expiry_time - current_time) }} seconds</p>
+        {% endif %}
+
         <button type="submit">Login</button>
     </form>
+    <form action="/resend_otp" method="POST">
+        {{ form.csrf_token }}
+        <button type="submit">Resend OTP</button>
+    </form>
     <p>Or</p>
-    <br>
     <a href="{{ url_for('login') }}">Login through Email and password</a>
-    
     <p>Not registered yet? <a href="{{ url_for('register') }}">Register here</a>.</p>
     {% endif %}
-   </div>
- 
+  </div>
+
   <footer class="bg-dark text-white text-center py-4">
     <ul class="nav justify-content-center">
       <li class="nav-item">
@@ -199,17 +208,18 @@
         <a class="nav-link" href="{{ url_for('admin_login') }}">Admin</a>
       </li>
     </ul>
-  
+
     <ul class="nav justify-content-right">
       <li class="nav-item">
         <a href="#" class="fa fa-facebook"></a>
-      </li class="nav-item">
-      <li>
+      </li>
+      <li class="nav-item">
         <a href="#" class="fa fa-twitter"></a>
       </li>
       <li class="nav-item"> 
         <a href="#" class="fa fa-youtube"></a>
       </li>
     </ul>
+  </footer>
 </body>
 </html>

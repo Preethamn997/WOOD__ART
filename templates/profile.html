@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <!-- Your custom styles specific to this page go here -->
   <style>
     body {
@@ -58,21 +59,95 @@
     .profile-form button[type="reset"] {
       margin-left: 20px;
       background-color: #ccc;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .navbar {
+      background-color: #FFA500;
+    }
+
+    .navbar-brand {
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .navbar-toggler-icon {
+      background-color: #fff;
+    }
+
+    .navbar-nav .nav-item .nav-link {
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .profile-details p {
+      margin: 5px 0;
+    }
+
+    footer {
+      background-color: #FFA500;
+      padding: 10px;
+      text-align: center;
+      color: #fff;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <nav class="w3-black navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
       <a class="navbar-brand" href="{{ url_for('home') }}">
-        <!-- Your brand logo goes here -->
+        <div class="w3-container">
+          <span class="w3-tag w3-large w3-yellow">W</span>
+          <span class="w3-tag w3-large">O</span>
+          <span class="w3-tag w3-large">O</span>
+          <span class="w3-tag w3-large w3-red">D</span>
+          <span class="w3-tag w3-large"> </span>
+          <span class="w3-tag w3-large">L</span>
+          <span class="w3-tag w3-large w3-yellow">O</span>
+          <span class="w3-tag w3-large">G</span>
+        </div>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <!-- Your navigation links go here -->
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('home') }}">
+                Home
+            </a>
+          </li>
+          {% if user_email %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('profile') }}">
+                Profile
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('logout') }}">
+                Logout
+              </a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('register') }}">
+                Register
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+            </li>
+          {% endif %}
+          <li class="nav-item">
+            <a class="shopping-cart" href="{{ url_for('cart') }}">
+              <i class="fa fa-shopping-cart" style="font-size: 24px"></i>
+            </a>
+          </li>
         </ul>
       </div>
     </div>

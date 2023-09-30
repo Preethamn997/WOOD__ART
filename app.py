@@ -14,6 +14,7 @@ from datetime import timedelta
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 from twilio.rest import Client
+import time
 
 app = Flask(__name__, static_url_path='/static')
 # csrf = CSRFProtect(app)
@@ -143,6 +144,7 @@ def login():
     return render_template('login.html', form=form)
 
 
+
 @app.route('/login_mobile', methods=['GET', 'POST'])
 def login_mobile():
     form = LoginForm()
@@ -160,6 +162,9 @@ def login_mobile():
             val = getOTPApi(full_mobile)
             if val:
                 print("value", val)
+                # Set an OTP expiry time (e.g., 5 minutes from now)
+                otp_expiry_time = int(time.time()) + 60  # 5 minutes in seconds
+                session['otp_expiry_time'] = otp_expiry_time
                 # Retrieve the OTP sent to the user from the session
                 sent_otp = session.get('response')
                 print("sent_otp", sent_otp)
@@ -178,6 +183,8 @@ def generateOTP():
     return random.randrange(100000, 999999)
 
 
+# ...
+
 @app.route('/validate_otp', methods=['POST'])
 def validate_otp():
     form = LoginForm()
@@ -189,9 +196,12 @@ def validate_otp():
     
     # Check if the mobile number is registered
     if entered_otp == sent_otp:
-        # OTP entered by the user matches the sent OTP
-        # Set user as logged in
-        
+        # Check if the OTP has expired
+        otp_expiry_time = session.get('otp_expiry_time', 0)
+        current_time = int(time.time())
+        if current_time > otp_expiry_time:
+            return render_template('validate_otp.html', form=form, error_message='OTP has expired. Please resend OTP.', otp_expiry_time=otp_expiry_time)
+
         user_mobile = session.get('user_mobile')
         print("user mobile", user_mobile)
         user_id = get_user_id_by_mobile(user_mobile)
@@ -208,11 +218,32 @@ def validate_otp():
                 flash("Login Successful", "success")
                 return redirect(session.pop('next', url_for('home')))
             else:
-                return render_template('validate_otp.html', form=form, error_message='Invalid OTP')
+                return render_template('validate_otp.html', form=form, error_message='Invalid OTP', otp_expiry_time=otp_expiry_time)
         else:
-            return render_template('validate_otp.html', form=form, error_message='Invalid OTP')
+            return render_template('validate_otp.html', form=form, error_message='Invalid OTP', otp_expiry_time=otp_expiry_time)
     else:
-        return render_template('login_mobile.html', form=form, error_message='Mobile number not registered, please register')
+        return render_template('validate_otp.html', form=form, error_message='Mobile number not registered, please register', otp_expiry_time=otp_expiry_time)
+
+
+@app.route('/resend_otp', methods=['POST'])
+def resend_otp():
+    user_mobile = session.get('user_mobile')
+    if user_mobile:
+        region = "+91"
+        full_mobile = region + user_mobile
+        val = getOTPApi(full_mobile)
+        if val:
+            # Set an updated OTP expiry time
+            otp_expiry_time = int(time.time()) + 300  # 5 minutes in seconds
+            session['otp_expiry_time'] = otp_expiry_time
+            flash("OTP Resent Successfully", "success")
+        else:
+            flash("Failed to resend OTP", "danger")
+    else:
+        flash("User mobile number not found", "danger")
+    
+    return redirect(url_for('validate_otp'))
+
 
 def get_user_id_by_mobile(mobile):
     con = sqlite3.connect("database.db")
@@ -223,6 +254,7 @@ def get_user_id_by_mobile(mobile):
     
     return user_id[0] if user_id else None
 
+
 def get_user_email_by_mobile(mobile):
     con = sqlite3.connect("database.db")
     cur = con.cursor()
@@ -231,8 +263,6 @@ def get_user_email_by_mobile(mobile):
     con.close()
     
     return user_email[0] if user_email else None
-
-
 
 
 def getOTPApi(number):

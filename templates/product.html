@@ -14,10 +14,27 @@
       object-fit: cover; /* Ensure images fit within the card */
       height: 200px; /* Set a fixed height for all images */
     }
+    .navbar-fixed {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000; /* Set a high z-index to ensure it appears above other content */
+    }
   
     .navbar-nav .nav-item .nav-link {
       color: #fff; /* Set the font color to white */
     }
+    
+    .navbar-brand {
+      font-size: 24px; /* Adjust the font size as needed */
+      font-weight: bold; /* Add font weight for emphasis */
+      color: #000; /* Set the font color */
+    }
+    .content-below-navbar {
+      margin-top: 60px; /* Adjust this value as needed based on your navbar height */
+    }
+
   </style>
 </head>
 <body>
