@@ -168,24 +168,24 @@
       <p>Welcome, {{ user_email }}</p>
       <a href="{{ logout_button_url }}">{{ logout_button_text }}</a>
     {% else %}
-      <form action="/login" method="POST">
+    <form method="POST" action="{{ url_for('login_mobile') }}">
         {{ form.csrf_token }}
-        <label for="email">Email:</label>
-        <input type="text" id="email" name="email" required >
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
+        {{ form.hidden_tag() }}
+        <label for="mobilenumber">Mobile Number:</label>
+        <input type="tel" name="mobilenumber" required>
+        
+        <!-- Add other fields as needed -->
+    
+        <button type="submit">Get OTP</button>
+    </form>
         <p>Or</p>
         <br>
-        <a href="{{ url_for('login_mobile') }}">Login through mobile number</a>
-        <button type="submit">Log In</button>
-      </form>
-      
+        <a href="{{ url_for('login') }}">Login through Email and password</a>
+        
       <p>Not registered yet? <a href="{{ url_for('register') }}">Register here</a>.</p>
     {% endif %}
   </div>
-  
+ 
   <footer class="bg-dark text-white text-center py-4">
     <ul class="nav justify-content-center">
       <li class="nav-item">

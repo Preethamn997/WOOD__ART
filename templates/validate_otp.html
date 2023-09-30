@@ -168,24 +168,22 @@
       <p>Welcome, {{ user_email }}</p>
       <a href="{{ logout_button_url }}">{{ logout_button_text }}</a>
     {% else %}
-      <form action="/login" method="POST">
+    <form action="/validate_otp" method="POST">
         {{ form.csrf_token }}
-        <label for="email">Email:</label>
-        <input type="text" id="email" name="email" required >
+        {{ form.hidden_tag() }}
+        <label for="otp">Enter OTP:</label>
+        <input id="otp" name="otp" type="text" required> 
         <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-        <p>Or</p>
-        <br>
-        <a href="{{ url_for('login_mobile') }}">Login through mobile number</a>
-        <button type="submit">Log In</button>
-      </form>
-      
-      <p>Not registered yet? <a href="{{ url_for('register') }}">Register here</a>.</p>
+        <button type="submit">Login</button>
+    </form>
+    <p>Or</p>
+    <br>
+    <a href="{{ url_for('login') }}">Login through Email and password</a>
+    
+    <p>Not registered yet? <a href="{{ url_for('register') }}">Register here</a>.</p>
     {% endif %}
-  </div>
-  
+   </div>
+ 
   <footer class="bg-dark text-white text-center py-4">
     <ul class="nav justify-content-center">
       <li class="nav-item">

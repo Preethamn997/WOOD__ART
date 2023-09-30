@@ -9,6 +9,25 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <!-- Your custom styles specific to this page go here -->
   <style>
+    .navbar-fixed {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000; /* Set a high z-index to ensure it appears above other content */
+    }
+
+    /* Add margin to the content below the fixed navbar to prevent overlap */
+    .content-below-navbar {
+      margin-top: 60px; /* Adjust this value as needed based on your navbar height */
+    }
+
+    /* Style the navbar brand text */
+    .navbar-brand {
+      font-size: 24px; /* Adjust the font size as needed */
+      font-weight: bold; /* Add font weight for emphasis */
+      color: #000; /* Set the font color */
+    }
     /* Additional styles specific to this page */
     .card-img-top {
       object-fit: cover; /* Ensure images fit within the card */
@@ -34,10 +53,9 @@
       max-width: 1000px; /* Set the maximum width for the slideshow container */
       overflow: hidden; /* Hide any overflowing content */
 }
-
-
   </style>
 </head>
+
 <body>
 <!-- Rest of the home page content remains unchanged -->
 <nav class="w3-black navbar navbar-expand-lg navbar-light bg-light">

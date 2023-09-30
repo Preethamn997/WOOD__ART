@@ -1,3 +1,4 @@
+import random
 from flask import Flask, render_template, request, flash, redirect, url_for, session, send_from_directory, jsonify
 import sqlite3
 import os
@@ -12,6 +13,7 @@ from wtforms.validators import DataRequired, Email
 from datetime import timedelta
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
+from twilio.rest import Client
 
 app = Flask(__name__, static_url_path='/static')
 # csrf = CSRFProtect(app)
@@ -140,6 +142,118 @@ def login():
     
     return render_template('login.html', form=form)
 
+
+@app.route('/login_mobile', methods=['GET', 'POST'])
+def login_mobile():
+    form = LoginForm()
+    if request.method == 'POST':
+        mobile = request.form.get('mobilenumber')
+        con = sqlite3.connect("database.db")
+        cur = con.cursor()
+        cur.execute("SELECT * FROM customer WHERE contact = ?", (mobile,))
+        user = cur.fetchone()
+        if user:
+            print("user existed")
+            region = "+91"
+            full_mobile = region + mobile
+            print("mobile", mobile)
+            val = getOTPApi(full_mobile)
+            if val:
+                print("value", val)
+                # Retrieve the OTP sent to the user from the session
+                sent_otp = session.get('response')
+                print("sent_otp", sent_otp)
+                # Set user_mobile in the session
+                session['user_mobile'] = mobile
+            return render_template('validate_otp.html', form=form)
+
+        else:
+            print("not existed")
+            return render_template('login_mobile.html', form=form)
+
+    return render_template('login_mobile.html', form=form)
+
+
+def generateOTP():
+    return random.randrange(100000, 999999)
+
+
+@app.route('/validate_otp', methods=['POST'])
+def validate_otp():
+    form = LoginForm()
+    entered_otp = request.form.get('otp')
+    print("Entered", entered_otp)
+    
+    sent_otp = session.get('response')
+    print("sent_otp", sent_otp)
+    
+    # Check if the mobile number is registered
+    if entered_otp == sent_otp:
+        # OTP entered by the user matches the sent OTP
+        # Set user as logged in
+        
+        user_mobile = session.get('user_mobile')
+        print("user mobile", user_mobile)
+        user_id = get_user_id_by_mobile(user_mobile)
+        print("user id:", user_id)
+        
+        if user_id:
+            session['user_id'] = user_id  # Set user_id in the session
+            session['email'] = get_user_email_by_mobile(user_mobile)
+
+            user_profile = get_user_profile(user_id)
+            
+            if user_profile:
+                session['user_profile'] = user_profile
+                flash("Login Successful", "success")
+                return redirect(session.pop('next', url_for('home')))
+            else:
+                return render_template('validate_otp.html', form=form, error_message='Invalid OTP')
+        else:
+            return render_template('validate_otp.html', form=form, error_message='Invalid OTP')
+    else:
+        return render_template('login_mobile.html', form=form, error_message='Mobile number not registered, please register')
+
+def get_user_id_by_mobile(mobile):
+    con = sqlite3.connect("database.db")
+    cur = con.cursor()
+    cur.execute("SELECT pid FROM customer WHERE contact = ?", (mobile,))
+    user_id = cur.fetchone()
+    con.close()
+    
+    return user_id[0] if user_id else None
+
+def get_user_email_by_mobile(mobile):
+    con = sqlite3.connect("database.db")
+    cur = con.cursor()
+    cur.execute("SELECT mail FROM customer WHERE contact = ?", (mobile,))
+    user_email = cur.fetchone()
+    con.close()
+    
+    return user_email[0] if user_email else None
+
+
+
+
+def getOTPApi(number):
+    account_sid = 'AC2659f249a8394794a500503acef10285'
+    auth_token = '75266b4cd748ae56ee0167a08e59458b'
+    client = Client(account_sid, auth_token)
+    otp = generateOTP()
+    body = 'Your otp is ' + str(otp)
+    session['response'] = str(otp)
+    print("session response", session['response'])
+    message = client.messages.create(
+        from_= '+18124962800',
+        body=body,
+        to=number
+    )
+
+    if message.sid:
+        print(message.sid)
+        return True
+    else:
+        return False
 
 
 # Flask route for registration
