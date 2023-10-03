@@ -176,17 +176,59 @@
         {{ form.hidden_tag() }}
         <label for="otp">Enter OTP:</label>
         <input id="otp" name="otp" type="text" required> 
+        <!-- Display the OTP timer -->
+<!-- Display the OTP timer -->
+{% if expiry_time %}
+<p id="otp-timer">OTP will expire in: <span id="otp-time"></span></p>
+<script>
+// JavaScript code to handle OTP timer
+const otpExpiryTime = '{{ expiry_time }}';
+console.log("otp_expiry_time:", otpExpiryTime); // Log the value for debugging
 
-        {% if otp_expiry_time %}
-            <p>OTP will expire in: {{ (otp_expiry_time - current_time) }} seconds</p>
-        {% endif %}
+function formatTime(seconds) {
+    return `${Math.floor(seconds)}s`; // Round down to the nearest whole second
+}
 
-        <button type="submit">Login</button>
+function startOTPTimer(expiryTime) {
+    const otpTimer = document.getElementById('otp-time');
+    let remainingTime = expiryTime - Math.floor(Date.now() / 1000);
+
+    function updateTimer() {
+        if (remainingTime <= 0) {
+            otpTimer.textContent = 'OTP has expired';
+            // Show the Resend OTP button when OTP expires
+            const resendButton = document.getElementById('resend-button');
+            resendButton.style.display = 'block';
+        } else {
+            otpTimer.textContent = formatTime(remainingTime);
+        }
+
+        if (remainingTime <= 0) {
+            clearTimeout(timer); // Stop the timer when OTP expires
+        } else {
+            remainingTime--;
+        }
+    }
+
+    updateTimer();
+    const timer = setInterval(updateTimer, 1000); // Update the timer every second
+}
+
+// Start the OTP timer
+startOTPTimer(otpExpiryTime);
+</script>
+{% endif %}
+
+       <button type="submit">Login</button>
     </form>
-    <form action="/resend_otp" method="POST">
-        {{ form.csrf_token }}
-        <button type="submit">Resend OTP</button>
-    </form>
+
+</form>
+<form action="/resend_otp" method="POST">
+    {{ form.csrf_token }}
+    <button id="resend-button" type="submit" style="display: none;">Resend OTP</button>
+</form>
+
+
     <p>Or</p>
     <a href="{{ url_for('login') }}">Login through Email and password</a>
     <p>Not registered yet? <a href="{{ url_for('register') }}">Register here</a>.</p>
