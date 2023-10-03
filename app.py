@@ -16,6 +16,7 @@ from geopy.distance import geodesic
 from twilio.rest import Client
 import time
 
+
 app = Flask(__name__, static_url_path='/static')
 # csrf = CSRFProtect(app)
 app.secret_key = "123"
@@ -144,7 +145,6 @@ def login():
     return render_template('login.html', form=form)
 
 
-
 @app.route('/login_mobile', methods=['GET', 'POST'])
 def login_mobile():
     form = LoginForm()
@@ -161,16 +161,13 @@ def login_mobile():
             print("mobile", mobile)
             val = getOTPApi(full_mobile)
             if val:
-                print("value", val)
-                # Set an OTP expiry time (e.g., 5 minutes from now)
-                otp_expiry_time = int(time.time()) + 60  # 5 minutes in seconds
-                session['otp_expiry_time'] = otp_expiry_time
                 # Retrieve the OTP sent to the user from the session
-                sent_otp = session.get('response')
-                print("sent_otp", sent_otp)
+                sent_otp_data = session.get('response')
+
+                expiry_time = sent_otp_data.get('expiry_time')
                 # Set user_mobile in the session
                 session['user_mobile'] = mobile
-            return render_template('validate_otp.html', form=form)
+            return render_template('validate_otp.html', form=form, expiry_time=expiry_time)
 
         else:
             print("not existed")
@@ -183,25 +180,27 @@ def generateOTP():
     return random.randrange(100000, 999999)
 
 
-# ...
-
 @app.route('/validate_otp', methods=['POST'])
 def validate_otp():
     form = LoginForm()
     entered_otp = request.form.get('otp')
     print("Entered", entered_otp)
     
-    sent_otp = session.get('response')
+    sent_otp_data = session.get('response')
+    sent_otp = sent_otp_data.get('otp')
+    expiry_time = sent_otp_data.get('expiry_time')
+
     print("sent_otp", sent_otp)
     
-    # Check if the mobile number is registered
-    if entered_otp == sent_otp:
-        # Check if the OTP has expired
-        otp_expiry_time = session.get('otp_expiry_time', 0)
-        current_time = int(time.time())
-        if current_time > otp_expiry_time:
-            return render_template('validate_otp.html', form=form, error_message='OTP has expired. Please resend OTP.', otp_expiry_time=otp_expiry_time)
+    # Check if the OTP has expired
+    if time.time() > expiry_time:
+        return render_template('validate_otp.html', form=form, error_message='OTP has expired. Please request a new one.')
 
+    # Continue with the OTP validation as before
+    if entered_otp == sent_otp:
+        # OTP entered by the user matches the sent OTP
+        # Set user as logged in
+        
         user_mobile = session.get('user_mobile')
         print("user mobile", user_mobile)
         user_id = get_user_id_by_mobile(user_mobile)
@@ -218,11 +217,11 @@ def validate_otp():
                 flash("Login Successful", "success")
                 return redirect(session.pop('next', url_for('home')))
             else:
-                return render_template('validate_otp.html', form=form, error_message='Invalid OTP', otp_expiry_time=otp_expiry_time)
+                return render_template('validate_otp.html', form=form, error_message='Invalid OTP')
         else:
-            return render_template('validate_otp.html', form=form, error_message='Invalid OTP', otp_expiry_time=otp_expiry_time)
+            return render_template('validate_otp.html', form=form, error_message='Invalid OTP')
     else:
-        return render_template('validate_otp.html', form=form, error_message='Mobile number not registered, please register', otp_expiry_time=otp_expiry_time)
+        return render_template('validate_otp.html', form=form, error_message='Mobile number not registered, please register')
 
 
 @app.route('/resend_otp', methods=['POST'])
@@ -254,7 +253,6 @@ def get_user_id_by_mobile(mobile):
     
     return user_id[0] if user_id else None
 
-
 def get_user_email_by_mobile(mobile):
     con = sqlite3.connect("database.db")
     cur = con.cursor()
@@ -271,7 +269,10 @@ def getOTPApi(number):
     client = Client(account_sid, auth_token)
     otp = generateOTP()
     body = 'Your otp is ' + str(otp)
-    session['response'] = str(otp)
+
+    # Store OTP and its expiration time in the session
+    session['response'] = {'otp': str(otp), 'expiry_time': time.time() + 60}  # 600 seconds (10 minutes)
+
     print("session response", session['response'])
     message = client.messages.create(
         from_= '+18124962800',
@@ -325,6 +326,7 @@ def register():
     
     return render_template('register.html', form=form)
 
+
 @app.route('/logout')
 def logout():
     # Clear session variables
@@ -334,7 +336,6 @@ def logout():
     
     flash("Logged out successfully", "success")
     return redirect(url_for('login'))
-
 
 
 @app.route('/product')
@@ -626,59 +627,54 @@ def update_profile():
 
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
-    form = LoginForm()
     # Check if the user is logged in
     if 'user_id' not in session:
         flash("Please login to add products to your cart.", "info")
-        return redirect(url_for('login'))
-    
+        return jsonify({"success": False, "message": "Not logged in"})
+
     # Get product details from the form
     product_id = request.form.get('product_id')
     quantity = request.form.get('quantity')
-    print(product_id)
-    print(quantity)
-    print(request.form)
-    
+
     # Validate product_id and quantity
     if not product_id or not quantity:
         flash("Invalid product details", "danger")
-        print("product not added to the cart")
-        return redirect(url_for('home'))
-    
+        return jsonify({"success": False, "message": "Invalid product details"})
+
     # Convert product_id and quantity to integers
     try:
         product_id = int(product_id)
         quantity = int(quantity)
     except ValueError:
         flash("Invalid product details", "danger")
-        return redirect(url_for('home'))
-    
+        return jsonify({"success": False, "message": "Invalid product details"})
+
     # Get user ID from session
     user_id = session['user_id']
-    
+
     # Retrieve product details from the products table based on the product_id
     con_products = sqlite3.connect("products.db")
     cur_products = con_products.cursor()
     cur_products.execute("SELECT title, category, price, image_path FROM products WHERE id = ?", (product_id,))
     product_data = cur_products.fetchone()
     con_products.close()
-    
+
     if not product_data:
         flash("Product not found", "danger")
-        return redirect(url_for('home'))
-    
+        return jsonify({"success": False, "message": "Product not found"})
+
     title, category, price, image_path = product_data
-    
+
     # Insert the product into the cart table
     con_cart = sqlite3.connect("cart.db")
     cur_cart = con_cart.cursor()
-    cur_cart.execute("INSERT INTO cart (user_id, product_id, title, category, quantity, price,image_path) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    cur_cart.execute("INSERT INTO cart (user_id, product_id, title, category, quantity, price, image_path) VALUES (?, ?, ?, ?, ?, ?, ?)",
                      (user_id, product_id, title, category, quantity, price, image_path))
     con_cart.commit()
     con_cart.close()
-    
+
     flash("Product added to cart", "success")
-    
+    return jsonify({"success": True, "message": "Product added to cart"})
     # Redirect back to the referring page (the page where the form was submitted)
     referring_page = request.headers.get('Referer')
     return redirect(referring_page)
