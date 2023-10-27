@@ -15,6 +15,18 @@
       flex-direction: column;
       min-height: 100vh;  
     }
+    .navbar-fixed {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000; /* Set a high z-index to ensure it appears above other content */
+    }
+
+    .navbar-nav .nav-item .nav-link {
+      color: #fff;
+      font-weight: bold;
+    }
 
     .top-border h2 {
       font-style: Monospace;
@@ -31,7 +43,8 @@
       border-radius: 5px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       text-align: left;
-      
+      max-width: 500px;
+      overflow: auto;
       border-top: 5px solid #FFA500;
       display: flex;
       flex-direction: column;
@@ -76,12 +89,24 @@
       cursor: pointer;
     }
 
+    /* Style the "Resend OTP" button */
+    .form-container form[action="/resend_otp"] button[type="submit"] {
+      background-color: transparent;
+      color: #FFA500;
+      border: none;
+      border-radius: 3px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
     footer {
       background-color: #FFA500;
       padding: 10px;
       text-align: center;
       color: #fff;
     }
+
     .navbar-nav .nav-item .nav-link {
       color: #fff; /* Set the font color to white */
     }
@@ -93,60 +118,61 @@
   </style>
 </head>
 <body>
-  <nav class="w3-black navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container">
-      <a class="navbar-brand" href="{{ url_for('home') }}">
-        <div class="w3-container">
-          <span class="w3-tag w3-large w3-yellow">W</span>
-          <span class="w3-tag w3-large">O</span>
-          <span class="w3-tag w3-large">O</span>
-          <span class="w3-tag w3-large w3-red">D</span>
-          <span class="w3-tag w3-large"> </span>
-          <span class="w3-tag w3-large">L</span>
-          <span class="w3-tag w3-large w3-yellow">O</span>
-          <span class="w3-tag w3-large">G</span>
+    <nav class="w3-black navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+          <a class="navbar-brand" href="{{ url_for('home') }}">
+            <div class="w3-container">
+              <span class="w3-tag w3-large w3-yellow">W</span>
+              <span class="w3-tag w3-large">O</span>
+              <span class="w3-tag w3-large">O</span>
+              <span class="w3-tag w3-large w3-red">D</span>
+              <span class="w3-tag w3-large"> </span>
+              <span class="w3-tag w3-large">L</span>
+              <span class="w3-tag w3-large w3-yellow">O</span>
+              <span class="w3-tag w3-large">G</span>
+            </div>
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('home') }}">
+                    Home
+                </a>
+              </li>
+              {% if user_email %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('profile') }}">
+                    Profile
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('logout') }}">
+                    Logout
+                  </a>
+                </li>
+              {% else %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('register') }}">
+                    Register
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                </li>
+              {% endif %}
+              <li class="nav-item">
+                <a class="shopping-cart" href="{{ url_for('cart') }}">
+                  <i class="fa fa-shopping-cart" style="font-size: 24px"></i>
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('home') }}">
-                Home
-            </a>
-          </li>
-          {% if user_email %}
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('profile') }}">
-                Profile
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('logout') }}">
-                Logout
-              </a>
-            </li>
-          {% else %}
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('register') }}">
-                Register
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('login') }}">Login</a>
-            </li>
-          {% endif %}
-          <li class="nav-item">
-            <a class="shopping-cart" href="{{ url_for('cart') }}">
-              <i class="fa fa-shopping-cart" style="font-size: 24px"></i>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+      </nav>
+    
   
 
   <!-- Flash messages -->
@@ -168,24 +194,24 @@
       <p>Welcome, {{ user_email }}</p>
       <a href="{{ logout_button_url }}">{{ logout_button_text }}</a>
     {% else %}
-      <form action="/login" method="POST">
+    <form method="POST" action="{{ url_for('login_mobile') }}">
         {{ form.csrf_token }}
-        <label for="email">Email:</label>
-        <input type="text" id="email" name="email" required >
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-        <p>Or</p>
-        <br>
-        <a href="{{ url_for('login_mobile') }}">Login through mobile number</a>
-        <button type="submit">Log In</button>
-      </form>
-      
-      <p>Not registered yet? <a href="{{ url_for('register') }}">Register here</a>.</p>
+        {{ form.hidden_tag() }}
+        <label for="mobilenumber">Mobile Number:</label>
+        <input type="tel" name="mobilenumber" required>
+        
+        <!-- Add other fields as needed -->
+    
+        <button type="submit">Get OTP</button>
+    </form>
+    <p>Or</p>
+    <br>
+    <a href="{{ url_for('login') }}">Login through Email and password</a>
+    
+    <p>Not registered yet? <a href="{{ url_for('register') }}">Register here</a>.</p>
     {% endif %}
-  </div>
-  
+   </div>
+ 
   <footer class="bg-dark text-white text-center py-4">
     <ul class="nav justify-content-center">
       <li class="nav-item">
@@ -205,13 +231,14 @@
     <ul class="nav justify-content-right">
       <li class="nav-item">
         <a href="#" class="fa fa-facebook"></a>
-      </li class="nav-item">
-      <li>
+      </li>
+      <li class="nav-item">
         <a href="#" class="fa fa-twitter"></a>
       </li>
       <li class="nav-item"> 
         <a href="#" class="fa fa-youtube"></a>
       </li>
     </ul>
+  </footer>
 </body>
 </html>

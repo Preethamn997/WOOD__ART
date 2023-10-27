@@ -1,51 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login</title>
+  <title>CanV Store - User Profile</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <!-- Your custom styles specific to this page go here -->
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       background-color: #f2f2f2;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;  
     }
 
-    .top-border h2 {
-      font-style: Monospace;
-      font-size: xx-large;
-      border: 2px solid #f2f2f2;
-      padding: 5px;
-      display: inline-block;
-    }
-
-    .form-container {
-      flex-grow: 1;
-      background-color: #fff;
+    .profile-container {
+      max-width: 800px;
+      margin: 20px auto;
       padding: 20px;
+      background-color: #fff;
       border-radius: 5px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      text-align: left;
-      
-      border-top: 5px solid #FFA500;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      max-width: 400px; /* Add this line to limit the maximum width */
-      margin: 0 auto;
     }
 
-    .form-container h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
+    .profile-form {
+      margin-top: 20px;
     }
 
-    .form-container label {
+    .profile-form label {
       display: inline-block;
       width: 120px;
       margin-bottom: 10px;
@@ -54,8 +36,7 @@
       text-align: left;
     }
 
-    .form-container input[type="text"],
-    .form-container input[type="password"] {
+    .profile-form input[type="text"] {
       width: 200px;
       padding: 8px;
       margin-bottom: 10px;
@@ -64,10 +45,9 @@
       font-size: 14px;
     }
 
-    .form-container button[type="submit"] {
-      width: 200px;
-      margin-left: 38%;
-      padding: 5px;
+    .profile-form button[type="submit"] {
+      width: 150px;
+      padding: 10px;
       background-color: #FFA500;
       color: #fff;
       border: none;
@@ -76,19 +56,44 @@
       cursor: pointer;
     }
 
+    .profile-form button[type="reset"] {
+      margin-left: 20px;
+      background-color: #ccc;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .navbar {
+      background-color: #FFA500;
+    }
+
+    .navbar-brand {
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .navbar-toggler-icon {
+      background-color: #fff;
+    }
+
+    .navbar-nav .nav-item .nav-link {
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .profile-details p {
+      margin: 5px 0;
+    }
+
     footer {
       background-color: #FFA500;
       padding: 10px;
       text-align: center;
       color: #fff;
-    }
-    .navbar-nav .nav-item .nav-link {
-      color: #fff; /* Set the font color to white */
-    }
-
-    /* Custom styles for the shopping cart icon */
-    .shopping-cart {
-       color: #fff; /* Set the font color to white */
+      font-weight: bold;
     }
   </style>
 </head>
@@ -147,71 +152,59 @@
       </div>
     </div>
   </nav>
-  
 
-  <!-- Flash messages -->
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        {% if category == 'success' %}
-          <div class="flash-message success">{{ message }}</div>
-        {% else %}
-          <div class="flash-message danger">{{ message }}</div>
-        {% endif %}
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
+  <div class="container profile-container">
+    <h1>User Profile</h1>
+    <div class="profile-details">
+      <p><strong>Name:</strong> {{ user.name }}</p>
+      <p><strong>Address 1:</strong> {{ user.address1 }}</p>
+      <p><strong>Address 2:</strong> {{ user.address2 }}</p>
+      <p><strong>City:</strong> {{ user.city }}</p>
+      <p><strong>Pincode:</strong> {{ user.pincode }}</p>
+      <p><strong>State:</strong> {{ user.state }}</p>
+      <p><strong>Contact:</strong> {{ user.contact }}</p>
+      <p><strong>Email:</strong> {{ user.mail }}</p>
+    </div>
 
-  <div class="form-container">
-    <h1>Login</h1>
-    {% if user_email %}
-      <p>Welcome, {{ user_email }}</p>
-      <a href="{{ logout_button_url }}">{{ logout_button_text }}</a>
-    {% else %}
-      <form action="/login" method="POST">
-        {{ form.csrf_token }}
-        <label for="email">Email:</label>
-        <input type="text" id="email" name="email" required >
+    <div class="profile-form">
+      <h2>Edit Profile</h2>
+      <form action="/update_profile" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="{{ user.name }}" required>
         <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+        <label for="address1">Address 1:</label>
+        <input type="text" id="address1" name="address1" value="{{ user.address1 }}" required>
         <br>
-        <p>Or</p>
+        <label for="address2">Address 2:</label>
+        <input type="text" id="address2" name="address2" value="{{ user.address2 }}">
         <br>
-        <a href="{{ url_for('login_mobile') }}">Login through mobile number</a>
-        <button type="submit">Log In</button>
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city" value="{{ user.city }}" required>
+        <br>
+        <label for="pincode">Pincode:</label>
+        <input type="text" id="pincode" name="pincode" value="{{ user.pincode }}" required>
+        <br>
+        <label for="state">State:</label>
+        <input type="text" id="state" name="state" value="{{ user.state }}" required>
+        <br>
+        <label for="contact">Contact:</label>
+        <input type="text" id="contact" name="contact" value="{{ user.contact }}" required>
+        <br>
+        <label for="mail">Email:</label>
+        <input type="text" id="mail" name="mail" value="{{ user.mail }}" required readonly>
+        <br>
+        <button type="submit">Update Profile</button>
+        <button type="reset">Reset</button>
       </form>
       
-      <p>Not registered yet? <a href="{{ url_for('register') }}">Register here</a>.</p>
-    {% endif %}
+      <form action="/logout" method="GET">
+        <button type="submit">Logout</button>
+      </form>
+    </div>
   </div>
-  
-  <footer class="bg-dark text-white text-center py-4">
-    <ul class="nav justify-content-center">
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('contact_us') }}">Contact Us</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('feedback') }}">Feedback</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('faq') }}">FAQ</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('admin_login') }}">Admin</a>
-      </li>
-    </ul>
-  
-    <ul class="nav justify-content-right">
-      <li class="nav-item">
-        <a href="#" class="fa fa-facebook"></a>
-      </li class="nav-item">
-      <li>
-        <a href="#" class="fa fa-twitter"></a>
-      </li>
-      <li class="nav-item"> 
-        <a href="#" class="fa fa-youtube"></a>
-      </li>
-    </ul>
+
+  <footer>
+    <p>&copy; 2023 CanV Store. All rights reserved.</p>
+  </footer>
 </body>
 </html>
